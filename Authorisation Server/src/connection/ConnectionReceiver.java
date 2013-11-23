@@ -2,7 +2,6 @@ package connection;
 
 import java.io.IOException;
 import java.net.ServerSocket;
-import java.net.Socket;
 
 public class ConnectionReceiver {
 
@@ -20,21 +19,17 @@ public class ConnectionReceiver {
 			System.out.println(e);
 		}
 
-		while(true){
-
-			Socket clientSocket = null; //Socket ouvert pour chaque client
+		System.out.println("SERVER: Serveur d'authentification en ligne...");
+		while(true){			
 			try {
-				clientSocket = myService.accept();
+				AuthorisationService AS = new AuthorisationService(myService.accept());
+				AS.run();
+				
+				System.out.println("SERVER: Connexion acceptee !");
 			}
 			catch (IOException e) {
 				System.out.println(e);
-			}
-			
-			AuthorisationService AS = new AuthorisationService(clientSocket);
-			AS.run();		    
+			}					    
 		}
-
 	}
-	
-	
 }

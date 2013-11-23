@@ -1,8 +1,11 @@
 package connection;
 
+import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.Socket;
 
 public class AuthorisationService implements Runnable {
@@ -15,26 +18,29 @@ public class AuthorisationService implements Runnable {
 
 	@Override
 	public void run() {
-		DataInputStream input = null; //Ouverture d'un canal d'entree
+		BufferedReader input = null; //Ouverture d'un canal d'entree
 		try {
-			input = new DataInputStream(clientSocket.getInputStream());
+			input = new BufferedReader(new InputStreamReader(this.clientSocket.getInputStream()));
 		}
 		catch (IOException e) {
 			System.out.println(e);
 		}
 
-		DataOutputStream output = null; //Ouverture d'un canal de sortie
+		PrintWriter output = null; //Ouverture d'un canal de sortie
 		try {
-			output = new DataOutputStream(clientSocket.getOutputStream());
+			output = new PrintWriter(this.clientSocket.getOutputStream(), true);
 		}
 		catch (IOException e) {
 			System.out.println(e);
 		}
 		
+		// Ici on peut envoyer des messages au client.
+		output.println("Coucou, client !");
+		
 		try {
 	        output.close();
 	        input.close();
-	        clientSocket.close();
+	        this.clientSocket.close();
 	        
 	     } 
 	     catch (IOException e) {
