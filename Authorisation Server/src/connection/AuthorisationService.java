@@ -23,19 +23,17 @@ public class AuthorisationService implements Runnable {
 	private BufferedReader input;
 	private PrintWriter output;
 	private PublicKey clientPubKey;
-	private byte[] buffer;
 	
 	public AuthorisationService(Socket clientSocket, RsaKey rsaKey) {
 		this.clientSocket = clientSocket;
 		this.rsaKey = rsaKey;
-		this.buffer = new byte[2000];
 	}
 
 	@Override
 	public void run() {
 		
 		initConnection();
-		sendPubKey();
+		//sendPubKey();
 		try {
 			receiveClientPubKey();
 		} catch (NoSuchAlgorithmException e) {
@@ -68,19 +66,10 @@ public class AuthorisationService implements Runnable {
 
 	private void receiveClientPubKey() throws NoSuchAlgorithmException, InvalidKeySpecException {
 		try{
-			byte[] lenb = new byte[4];
-			this.clientSocket.getInputStream().read(lenb,0,4);
-            ByteBuffer buffer = ByteBuffer.wrap(lenb);
-            int len = buffer.getInt();
-            //System.out.println(len);
-            //byte[] clientPubKeyBytes = new byte[len];
-            //this.clientSocket.getInputStream().read(clientPubKeyBytes);
-            this.clientSocket.getInputStream().read(this.buffer);
-            //System.out.println(DatatypeConverter.printHexBinary(servPubKeyBytes));
-            //X509EncodedKeySpec ks = new X509EncodedKeySpec(clientPubKeyBytes);
-            X509EncodedKeySpec ks = new X509EncodedKeySpec(this.buffer);
-            KeyFactory kf = KeyFactory.getInstance("RSA");
-            this.clientPubKey = kf.generatePublic(ks);
+			String clientPubKeyString = this.input.readLine();
+			byte[] clientPubKeyByte = clientPubKeyString.getBytes();
+			byte[] decode = Base64.decode(clientPubKeyByte, Base64.DEFAULT);
+			//System.out.println(clientPubKeyByte);
             //System.out.println(DatatypeConverter.printHexBinary(asPubKey.getEncoded()));
 		} catch (IOException e){
 			System.out.println("Read failed");

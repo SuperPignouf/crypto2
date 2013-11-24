@@ -29,10 +29,10 @@ public class ToAuthorisationServer {
 		this.rsaKey = rsaKey;
 		initConnection();
 		sendPubKey();
-		receiveASPubKey();
+		//receiveASPubKey();
 		closeConnection();
 
-		printKeys();
+		//printKeys();
 	}
 	
 	private void printKeys() {
@@ -77,9 +77,6 @@ public class ToAuthorisationServer {
 
 	private void sendPubKey() {
 		PublicKey servicePubKey = this.rsaKey.getKeyPair().getPublic();
-		ByteBuffer buffer = ByteBuffer.allocate(4);
-		buffer.putInt(servicePubKey.getEncoded().length);
-		output.print(buffer.array());
 		//System.out.println(DatatypeConverter.printHexBinary(servicePubKey.getEncoded()));
 		output.print(servicePubKey.getEncoded());
 		output.flush();
