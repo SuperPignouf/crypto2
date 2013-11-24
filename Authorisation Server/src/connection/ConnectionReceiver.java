@@ -3,11 +3,13 @@ package connection;
 import java.io.IOException;
 import java.net.ServerSocket;
 
+import crypto.RsaKey;
+
 public class ConnectionReceiver {
 
 	private ServerSocket myService;
 
-	public ConnectionReceiver(){
+	public ConnectionReceiver(RsaKey rsaKey){
 
 
 		this.myService = null; //Socket du serveur
@@ -32,4 +34,5 @@ public class ConnectionReceiver {
 			}					    
 		}
 	}
+
 }
