@@ -10,8 +10,14 @@ public class RsaKey {
 	private KeyPair keyPair;
 
 
-	public RsaKey() throws NoSuchAlgorithmException{
-		KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
+	public RsaKey(){
+		KeyPairGenerator keyPairGenerator = null;
+		try {
+			keyPairGenerator = KeyPairGenerator.getInstance("RSA");
+		} catch (NoSuchAlgorithmException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		keyPairGenerator.initialize(1024);
 		this.keyPair = keyPairGenerator.genKeyPair();
 	}

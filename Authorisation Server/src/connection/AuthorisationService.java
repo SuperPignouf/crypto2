@@ -1,18 +1,16 @@
 package connection;
 
 import java.io.BufferedReader;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.nio.ByteBuffer;
-import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
-import java.security.spec.X509EncodedKeySpec;
 
 import crypto.RsaKey;
 
@@ -33,13 +31,16 @@ public class AuthorisationService implements Runnable {
 	public void run() {
 		
 		initConnection();
-		//sendPubKey();
+		sendPubKey();
 		try {
 			receiveClientPubKey();
 		} catch (NoSuchAlgorithmException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (InvalidKeySpecException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
@@ -53,8 +54,8 @@ public class AuthorisationService implements Runnable {
 	private void closeConnection() {
 		
 		try {
-	        output.close();
-	        input.close();
+			this.output.close();
+			this.input.close();
 	        this.clientSocket.close();
 	        
 	     } 
@@ -64,13 +65,12 @@ public class AuthorisationService implements Runnable {
 		
 	}
 
-	private void receiveClientPubKey() throws NoSuchAlgorithmException, InvalidKeySpecException {
-		try{
-			String clientPubKeyString = this.input.readLine();
-			byte[] clientPubKeyByte = clientPubKeyString.getBytes();
-			byte[] decode = Base64.decode(clientPubKeyByte, Base64.DEFAULT);
-			//System.out.println(clientPubKeyByte);
-            //System.out.println(DatatypeConverter.printHexBinary(asPubKey.getEncoded()));
+	private void receiveClientPubKey() throws NoSuchAlgorithmException, InvalidKeySpecException, ClassNotFoundException {
+		try{	
+			ObjectInputStream keyIn = new ObjectInputStream(this.clientSocket.getInputStream());
+			this.clientPubKey = (PublicKey)keyIn.readObject();
+			
+			//System.out.println(clientPubKey);
 		} catch (IOException e){
 			System.out.println("Read failed");
 			System.exit(1);
@@ -80,13 +80,16 @@ public class AuthorisationService implements Runnable {
 	}
 
 	private void sendPubKey() {
-		PublicKey ASPubKey = this.rsaKey.getKeyPair().getPublic();
-		ByteBuffer buffer = ByteBuffer.allocate(4);
-		buffer.putInt(ASPubKey.getEncoded().length);
-		output.print(buffer.array());
-		//System.out.println(DatatypeConverter.printHexBinary(servicePubKey.getEncoded()));
-		output.print(ASPubKey.getEncoded());
-		output.flush();
+		try
+	    {
+	        ObjectOutputStream outO = new ObjectOutputStream(this.clientSocket.getOutputStream());
+	        outO.writeObject(this.rsaKey.getKeyPair().getPublic());
+	        outO.flush();
+	    }
+	    catch (Exception ex)
+	    {
+	        ex.printStackTrace();
+	    }
 		
 	}
 
@@ -101,7 +104,7 @@ public class AuthorisationService implements Runnable {
 
 		this.output = null; //Ouverture d'un canal de sortie
 		try {
-			output = new PrintWriter(this.clientSocket.getOutputStream(), true);
+			this.output = new PrintWriter(new OutputStreamWriter(this.clientSocket.getOutputStream()));
 		}
 		catch (IOException e) {
 			System.out.println(e);
