@@ -9,7 +9,7 @@ public class ConnectionReceiver {
 
 	private ServerSocket myService;
 
-	public ConnectionReceiver(RsaKey rsaKey){
+	public ConnectionReceiver(RsaKey rsaKey) throws IOException{
 		
 		initConnection();
 		while(true) acceptConnection(rsaKey);
@@ -28,21 +28,12 @@ public class ConnectionReceiver {
 				System.out.println(e);
 			}					    
 		}
-		
+
 	}
 
 
-	private void initConnection() {
-		this.myService = null; //Socket du serveur
-
-		try {
-			this.myService = new ServerSocket(2442);
-			//System.out.println("SERVER: Serveur d'authentification en ligne...");
-		}
-		catch (IOException e) {
-			System.out.println(e);
-		}
-		
+	private void initConnection() throws IOException {
+		this.myService = new ServerSocket(2442);
 	}
 
 }
