@@ -22,7 +22,7 @@ public class ConnectionReceiver {
 				AuthorisationService AS = new AuthorisationService(this.myService.accept(), rsaKey);
 				AS.run();
 				
-				//System.out.println("SERVER: Connexion acceptee !");
+				System.out.println("SERVER: Connexion entrante !");
 			}
 			catch (IOException e) {
 				System.out.println(e);
