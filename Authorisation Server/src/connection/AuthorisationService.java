@@ -198,7 +198,7 @@ public class AuthorisationService implements Runnable {
 		outO.writeObject(this.rsaKey.getKeyPair().getPublic());
 		outO.flush();
 		
-		System.out.println("SERVER Ma cle publique envoyee au client:" + clientPubKey);
+		System.out.println("SERVER Ma cle publique envoyee au client:" + this.rsaKey.getKeyPair().getPublic());
 	}
 
 	private void initConnection() throws IOException {

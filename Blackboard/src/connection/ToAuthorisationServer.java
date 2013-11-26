@@ -116,12 +116,16 @@ public class ToAuthorisationServer {
 
 		ObjectInputStream keyIn = new ObjectInputStream(this.toAS.getInputStream());
 		this.ASPubKey = (PublicKey)keyIn.readObject();
+		
+		System.out.println("BLACKBOARD Cle publique recue du AS:" + this.ASPubKey);
 	}
 
 	private void sendPubKey() throws IOException {
 		ObjectOutputStream outO = new ObjectOutputStream(this.toAS.getOutputStream());
 		outO.writeObject(this.rsaKey.getKeyPair().getPublic());
 		outO.flush();
+		
+		System.out.println("BLACKBOARD Ma cle publique envoyee au AS:" + this.rsaKey.getKeyPair().getPublic());
 	}
 
 	private void initConnection() throws IOException{
