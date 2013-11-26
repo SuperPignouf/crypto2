@@ -187,7 +187,7 @@ public class AuthorizationService implements Runnable {
 		keyGen.init(128);
 		this.AESBlackboardKey = keyGen.generateKey();
 
-		Cipher cipher = Cipher.getInstance("AES");
+		Cipher cipher = Cipher.getInstance("RSA");
 		cipher.init(Cipher.ENCRYPT_MODE, this.clientPubKey);
 		
 		//byte[] encryptedAESBlackboardKey = cipher.doFinal(this.AESBlackboardKey.getEncoded());
