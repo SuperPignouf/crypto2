@@ -114,7 +114,7 @@ public class AuthorizationService implements Runnable {
 			System.out.println("SERVER: Blackboard fully authentified.");
 			System.out.println("\nAES:");
 			System.out.println("SERVER: Distribution of the symmetric key...");
-			//createAndSendAES();
+			createAndSendAES();
 		}
 	}
 	
