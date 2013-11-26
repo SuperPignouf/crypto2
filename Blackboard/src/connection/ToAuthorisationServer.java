@@ -88,8 +88,8 @@ public class ToAuthorisationServer {
 		outO.writeObject(encryptedR1);
 		outO.flush();
 		
-		System.out.println("BLACKBOARD: R1 sent to the AS: " + this.r1);
 		System.out.println("BLACKBOARD: ID sent to the AS: " + this.ID);
+		System.out.println("BLACKBOARD: R1 sent to the AS: " + this.r1);
 	}
 	
 	private boolean receiveIdAndOnceFromAS() throws IllegalBlockSizeException, BadPaddingException, InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, IOException, ClassNotFoundException {
@@ -106,9 +106,10 @@ public class ToAuthorisationServer {
 
 		if(this.ASID == 0 && receivedR1 == this.r1)result = true; //System.out.println("Client: serveur d'authentification authentifie");
 
-		System.out.println("BLACKBOARD: R2 received from the AS: " + this.r2);
-		System.out.println("BLACKBOARD: R1 received from the AS: " + receivedR1);
 		System.out.println("BLACKBOARD: ID received from the AS: " + this.ASID);
+		System.out.println("BLACKBOARD: R1 received from the AS: " + receivedR1);
+		System.out.println("BLACKBOARD: R2 received from the AS: " + this.r2);
+		
 		return result;
 	}
 
