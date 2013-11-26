@@ -11,7 +11,7 @@ public class ConnectionReceiver {
 
 	public ConnectionReceiver(RsaKey rsaKey) throws IOException{
 		
-		initConnection();
+		initSocketConnection();
 		acceptConnections(rsaKey);
 	}
 
@@ -32,7 +32,7 @@ public class ConnectionReceiver {
 	}
 
 
-	private void initConnection() throws IOException {
+	private void initSocketConnection() throws IOException {
 		this.myService = new ServerSocket(2442);
 	}
 

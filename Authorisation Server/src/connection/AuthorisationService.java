@@ -41,7 +41,7 @@ public class AuthorisationService implements Runnable {
 
 		try {
 
-			initConnection();
+			initPipeConnection();
 			sendPubKey();
 			receiveClientPubKey();
 			needhamSchroeder();
@@ -163,7 +163,7 @@ public class AuthorisationService implements Runnable {
 		outO.flush();
 	}
 
-	private void initConnection() throws IOException {
+	private void initPipeConnection() throws IOException {
 		input = new BufferedReader(new InputStreamReader(this.clientSocket.getInputStream()));
 		this.output = new PrintWriter(new OutputStreamWriter(this.clientSocket.getOutputStream()));
 	}
