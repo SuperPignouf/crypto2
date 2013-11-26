@@ -72,6 +72,7 @@ public class AuthorizationService implements Runnable {
 	}
 	
 	private void sendPubKey() throws IOException {
+		System.out.println("PUBLIC KEYS");
 		ObjectOutputStream outO = new ObjectOutputStream(this.clientSocket.getOutputStream());
 		outO.writeObject(this.rsaKey.getKeyPair().getPublic());
 		outO.flush();
@@ -97,6 +98,8 @@ public class AuthorizationService implements Runnable {
 	 * @throws ClassNotFoundException
 	 */
 	private void needhamSchroeder() throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, IOException, ClassNotFoundException {
+		System.out.println("\n\nNEEDHAM-SCHROEDER PROTOCOL:");
+		System.out.println("RSA:");
 		boolean partnerRecognized = false;
 		Random randomGenerator = new Random();
 		this.r2 = randomGenerator.nextInt(1000000);
@@ -109,6 +112,7 @@ public class AuthorizationService implements Runnable {
 		
 		if(this.clientID == 1 && partnerRecognized){
 			System.out.println("SERVER: Blackboard fully authentified.");
+			System.out.println("\nAES:");
 			System.out.println("SERVER: Distribution of the symmetric key...");
 			//createAndSendAES();
 		}
@@ -165,7 +169,7 @@ public class AuthorizationService implements Runnable {
 		int receivedR2 = (Integer)encryptedR2.getObject(cipher);
 		if(this.clientID == 1 && receivedR2 == this.r2) result = true;
 
-		System.out.println("R2 received from the client: " + receivedR2);
+		System.out.println("SERVER: R2 received from the client: " + receivedR2);
 		return result;
 	}
 	
