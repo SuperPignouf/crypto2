@@ -39,7 +39,7 @@ public class ToAuthorisationServer {
 		receiveASPubKey();
 		needhamSchroeder();
 		closeConnection();
-		printKeys();
+		//printKeys();
 	}
 
 	private void needhamSchroeder() throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, IOException, BadPaddingException, ClassNotFoundException {
@@ -59,6 +59,8 @@ public class ToAuthorisationServer {
 		ObjectOutputStream outO = new ObjectOutputStream(this.toAS.getOutputStream());
 		outO.writeObject(encryptedR2);
 		outO.flush();
+		
+		System.out.println("BLACKBOARD : R2 sent to AS" + this.r2);
 	}
 
 	private boolean receiveIdAndOnceFromAS() throws IllegalBlockSizeException, BadPaddingException, InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, IOException, ClassNotFoundException {
@@ -75,8 +77,9 @@ public class ToAuthorisationServer {
 
 		if(this.ASID == 0 && receivedR1 == this.r1)result = true; //System.out.println("Client: serveur d'authentification authentifie");
 
-		//System.out.println(r1);
-		//System.out.println(clientPubKey);
+		System.out.println("BLACKBOARD : R2 received from AS" + this.r2);
+		System.out.println("BLACKBOARD : R1 received from AS" + receivedR1);
+		System.out.println("BLACKBOARD : ID received from AS" + this.ASID);
 		return result;
 	}
 
@@ -90,6 +93,9 @@ public class ToAuthorisationServer {
 		outO.flush();
 		outO.writeObject(encryptedR1);
 		outO.flush();
+		
+		System.out.println("BLACKBOARD : R1 sent to AS" + this.r1);
+		System.out.println("BLACKBOARD : ID sent to AS" + this.ID);
 	}
 
 	private void printKeys() {

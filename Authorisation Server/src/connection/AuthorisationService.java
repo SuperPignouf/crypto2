@@ -11,12 +11,16 @@ import java.net.Socket;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
+import java.security.SecureRandom;
 import java.util.Random;
+
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.KeyGenerator;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SealedObject;
+import javax.crypto.SecretKey;
 
 import crypto.RsaKey;
 
@@ -29,6 +33,7 @@ public class AuthorisationService implements Runnable {
 	private PublicKey clientPubKey;
 	private int ID, clientID;
 	private int r1, r2;
+	private SecretKey AESBlackboardKey;
 
 	public AuthorisationService(Socket clientSocket, RsaKey rsaKey) {
 		this.ID = 0;
@@ -46,7 +51,7 @@ public class AuthorisationService implements Runnable {
 			receiveClientPubKey();
 			needhamSchroeder();
 			closeConnection();
-			printKey();
+			//printKey();
 
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -76,7 +81,7 @@ public class AuthorisationService implements Runnable {
 		System.out.println("SERVER: My keys:" + this.rsaKey.getKeyPair());
 		System.out.println("SERVER: My private:" + this.rsaKey.getKeyPair().getPrivate());
 		System.out.println("SERVER: My public:" + this.rsaKey.getKeyPair().getPublic());
-		System.out.println("SERVER: My private:" + this.rsaKey.getKeyPair().getPrivate());
+		System.out.println("SERVER: My private:" + this.clientPubKey);
 		
 	}
 
@@ -89,7 +94,30 @@ public class AuthorisationService implements Runnable {
 			sendIdAndOncesToService();
 			partnerRecognized = receiveOnceBackFromService();
 		}
-		if (partnerRecognized) System.out.println("Server: Partner recognized");
+		//if (partnerRecognized) System.out.println("Server: Partner recognized");
+		
+		if(this.clientID == 1 && partnerRecognized){
+			System.out.println("Server: Blackboard fully authentified.");
+			//createAndSendAES();
+			
+		}
+
+	}
+
+	private void createAndSendAES() throws NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, IOException, InvalidKeyException {
+		KeyGenerator keyGen = KeyGenerator.getInstance("AES");
+		SecureRandom random = new SecureRandom();
+		keyGen.init(random); 
+		this.AESBlackboardKey = keyGen.generateKey();
+
+		Cipher cipher = Cipher.getInstance("RSA");
+		cipher.init(Cipher.ENCRYPT_MODE, this.clientPubKey);
+		SealedObject encryptedAESBlackboardKey = new SealedObject(this.AESBlackboardKey, cipher);
+		ObjectOutputStream outO = new ObjectOutputStream(this.clientSocket.getOutputStream());
+		outO.writeObject(encryptedAESBlackboardKey);
+		outO.flush();
+
+		System.out.println("Server: Blackboard AES key sent.");
 
 	}
 
@@ -104,7 +132,7 @@ public class AuthorisationService implements Runnable {
 		int receivedR2 = (Integer)encryptedR2.getObject(cipher);
 		if(this.clientID == 1 && receivedR2 == this.r2) result = true;
 
-		System.out.println(clientPubKey);
+		System.out.println("R2 recu du client: " + receivedR2);
 		return result;
 	}
 
@@ -122,6 +150,11 @@ public class AuthorisationService implements Runnable {
 		outO.flush();
 		outO.writeObject(encryptedR2);
 		outO.flush();
+		
+		System.out.println("SERVER : ID envoyee au blackboard: " + this.ID);
+		System.out.println("SERVER : R1 envoye au blackboard: " + this.r1);
+		System.out.println("SERVER : R2 envoye au blackboard: " + this.r2);
+		
 	}
 
 	private void receiveIdAndOnce() throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, IOException, ClassNotFoundException {
@@ -133,11 +166,14 @@ public class AuthorisationService implements Runnable {
 		SealedObject clientEncryptedID = (SealedObject)in.readObject();
 		this.clientID = (Integer)clientEncryptedID.getObject(cipher);
 		if(this.clientID == 1){ // Cas du blackboard
-			System.out.println("Server: BlackBoard detected");
+			//System.out.println("Server: BlackBoard detected");
 			SealedObject EncryptedR1 = (SealedObject)in.readObject();
 			this.r1 = (Integer)EncryptedR1.getObject(cipher);
-			System.out.println(r1);
+			//System.out.println(r1);
 		}
+		
+		System.out.println("SERVER : ID recue du client: " + this.clientID);
+		System.out.println("SERVER : R1 recu du client: " + this.r1);
 
 	}
 
@@ -152,7 +188,7 @@ public class AuthorisationService implements Runnable {
 		ObjectInputStream keyIn = new ObjectInputStream(this.clientSocket.getInputStream());
 		this.clientPubKey = (PublicKey)keyIn.readObject();
 
-		//System.out.println(clientPubKey);
+		System.out.println("SERVER Cle publique du client recue:" + clientPubKey);
 
 
 	}
@@ -161,6 +197,8 @@ public class AuthorisationService implements Runnable {
 		ObjectOutputStream outO = new ObjectOutputStream(this.clientSocket.getOutputStream());
 		outO.writeObject(this.rsaKey.getKeyPair().getPublic());
 		outO.flush();
+		
+		System.out.println("SERVER Ma cle publique envoyee au client:" + clientPubKey);
 	}
 
 	private void initConnection() throws IOException {
