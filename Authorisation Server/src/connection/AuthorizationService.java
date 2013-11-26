@@ -103,10 +103,10 @@ public class AuthorizationService implements Runnable {
 		boolean partnerRecognized = false;
 		Random randomGenerator = new Random();
 		this.r2 = randomGenerator.nextInt(1000000);
-		receiveIdAndOnce();
+		receiveIdAndNonce();
 		if (this.clientID == 1){
-			sendIdAndOncesToService();
-			partnerRecognized = receiveOnceBackFromService();
+			sendIdAndNoncesToService();
+			partnerRecognized = receiveNonceBackFromService();
 		}
 		//if (partnerRecognized) System.out.println("Server: Partner recognized");
 		
@@ -118,7 +118,7 @@ public class AuthorizationService implements Runnable {
 		}
 	}
 	
-	private void receiveIdAndOnce() throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, IOException, ClassNotFoundException {
+	private void receiveIdAndNonce() throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, IOException, ClassNotFoundException {
 		Cipher cipher = Cipher.getInstance("RSA");
 		cipher.init(Cipher.DECRYPT_MODE, this.rsaKey.getKeyPair().getPrivate());
 
@@ -138,7 +138,7 @@ public class AuthorizationService implements Runnable {
 
 	}
 	
-	private void sendIdAndOncesToService() throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, IOException {
+	private void sendIdAndNoncesToService() throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, IOException {
 		Cipher cipher = Cipher.getInstance("RSA");
 		cipher.init(Cipher.ENCRYPT_MODE, this.clientPubKey);
 		SealedObject encryptedID = new SealedObject(this.ID, cipher);
@@ -158,7 +158,7 @@ public class AuthorizationService implements Runnable {
 		System.out.println("SERVER: R2 sent to the blackboard: " + this.r2);
 	}
 
-	private boolean receiveOnceBackFromService() throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, IOException, ClassNotFoundException {
+	private boolean receiveNonceBackFromService() throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, IOException, ClassNotFoundException {
 		boolean result = false;
 		Cipher cipher = Cipher.getInstance("RSA");
 		cipher.init(Cipher.DECRYPT_MODE, this.rsaKey.getKeyPair().getPrivate());
@@ -187,7 +187,7 @@ public class AuthorizationService implements Runnable {
 		keyGen.init(128);
 		this.AESBlackboardKey = keyGen.generateKey();
 
-		Cipher cipher = Cipher.getInstance("RSA");
+		Cipher cipher = Cipher.getInstance("AES");
 		cipher.init(Cipher.ENCRYPT_MODE, this.clientPubKey);
 		
 		//byte[] encryptedAESBlackboardKey = cipher.doFinal(this.AESBlackboardKey.getEncoded());

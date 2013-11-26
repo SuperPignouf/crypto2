@@ -72,12 +72,12 @@ public class ToAuthorisationServer {
 		boolean ASRecognized = false;
 		Random randomGenerator = new Random();
 		this.r1 = randomGenerator.nextInt(1000000);
-		sendIdAndOnce();
-		ASRecognized = receiveIdAndOnceFromAS();
-		if(ASRecognized) sendOnceBack();
+		sendIdAndNonce();
+		ASRecognized = receiveIdAndNonceFromAS();
+		if(ASRecognized) sendNonceBack();
 	}
 	
-	private void sendIdAndOnce() throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, IOException {
+	private void sendIdAndNonce() throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, IOException {
 		Cipher cipher = Cipher.getInstance("RSA");
 		cipher.init(Cipher.ENCRYPT_MODE, this.ASPubKey);
 		SealedObject encryptedR1 = new SealedObject(this.r1, cipher);
@@ -92,7 +92,7 @@ public class ToAuthorisationServer {
 		System.out.println("BLACKBOARD: R1 sent to the AS: " + this.r1);
 	}
 	
-	private boolean receiveIdAndOnceFromAS() throws IllegalBlockSizeException, BadPaddingException, InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, IOException, ClassNotFoundException {
+	private boolean receiveIdAndNonceFromAS() throws IllegalBlockSizeException, BadPaddingException, InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, IOException, ClassNotFoundException {
 		boolean result = false;
 		Cipher cipher = Cipher.getInstance("RSA");
 		cipher.init(Cipher.DECRYPT_MODE, this.rsaKey.getKeyPair().getPrivate());
@@ -113,7 +113,7 @@ public class ToAuthorisationServer {
 		return result;
 	}
 
-	private void sendOnceBack() throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, IOException {
+	private void sendNonceBack() throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, IOException {
 		Cipher cipher = Cipher.getInstance("RSA");
 		cipher.init(Cipher.ENCRYPT_MODE, this.ASPubKey);
 		SealedObject encryptedR2 = new SealedObject(this.r2, cipher);
