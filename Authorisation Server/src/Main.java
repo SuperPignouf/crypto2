@@ -1,22 +1,22 @@
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 
-import connection.ConnectionReceiver;
+import connection.AuthorizationServer;
 import crypto.RsaKey;
 
 /**
- * Main class: Create a connectionReceiver.
+ * Main class: Create the authorization server.
  */
 public class Main {
 	
 	/**
-	 * Main: create a connectionReceiver.
+	 * Main: create the Authorization Server.
 	 * @param args arguments for the main.
 	 * @throws NoSuchAlgorithmException
 	 * @throws IOException
 	 */
 	public static void main(String[] args) throws NoSuchAlgorithmException, IOException{
-		ConnectionReceiver CR = new ConnectionReceiver(new RsaKey());
+		AuthorizationServer AS = new AuthorizationServer(new RsaKey());
 	}
 	
 }

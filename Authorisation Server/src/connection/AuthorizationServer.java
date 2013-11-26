@@ -5,31 +5,34 @@ import java.net.ServerSocket;
 
 import crypto.RsaKey;
 
-public class ConnectionReceiver {
+/**
+ * Class to create the Authorization server: it initializes the socket. 
+ */
+public class AuthorizationServer {
 
 	private ServerSocket myService;
 
 	/**
-	 * Constructor: create the server.
-	 * @param rsaKey
+	 * Constructor: create the Authorization Server.
+	 * @param rsaKey the pair of keys (public and private) RSA.
 	 * @throws IOException
 	 */
-	public ConnectionReceiver(RsaKey rsaKey) throws IOException{
+	public AuthorizationServer(RsaKey rsaKey) throws IOException{
 		initSocketConnection();
 		acceptConnections(rsaKey);
 	}
 
 	/**
-	 * Accepts connection with clients.
+	 * Server: accepts connection with clients. 
+	 * Runs the thread that identifies the client (with RSA).
+	 * If the client has been identified, it distributes securely a symmetric key (AES).
 	 * @param rsaKey
 	 */
 	private void acceptConnections(RsaKey rsaKey) {
 		while(true){			
 			try {
-				AuthorisationServer AS = new AuthorisationServer(this.myService.accept(), rsaKey);
+				AuthorizationService AS = new AuthorizationService(this.myService.accept(), rsaKey);
 				AS.run();
-				
-				System.out.println("SERVER: Connexion entrante !");
 			}
 			catch (IOException e) {
 				System.out.println(e);
