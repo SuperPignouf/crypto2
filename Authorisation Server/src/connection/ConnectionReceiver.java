@@ -10,11 +10,9 @@ public class ConnectionReceiver {
 	private ServerSocket myService;
 
 	public ConnectionReceiver(RsaKey rsaKey) throws IOException{
-		
 		initSocketConnection();
 		acceptConnections(rsaKey);
 	}
-
 
 	private void acceptConnections(RsaKey rsaKey) {
 		while(true){			
