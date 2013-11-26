@@ -97,15 +97,18 @@ public class AuthorizationService implements Runnable {
 
 	}
 
-	private void createAndSendAES() throws NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, IOException, InvalidKeyException {
+	private void createAndSendAES() throws NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, IOException, InvalidKeyException, BadPaddingException {
 		KeyGenerator keyGen = KeyGenerator.getInstance("AES");
-		SecureRandom random = new SecureRandom();
-		keyGen.init(random); 
+		keyGen.init(128);
 		this.AESBlackboardKey = keyGen.generateKey();
 
 		Cipher cipher = Cipher.getInstance("RSA");
 		cipher.init(Cipher.ENCRYPT_MODE, this.clientPubKey);
+		
+		//byte[] encryptedAESBlackboardKey = cipher.doFinal(this.AESBlackboardKey.getEncoded());
+		
 		SealedObject encryptedAESBlackboardKey = new SealedObject(this.AESBlackboardKey, cipher);
+		
 		ObjectOutputStream outO = new ObjectOutputStream(this.clientSocket.getOutputStream());
 		outO.writeObject(encryptedAESBlackboardKey);
 		outO.flush();
