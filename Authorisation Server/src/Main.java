@@ -16,7 +16,7 @@ public class Main {
 	 * @throws IOException
 	 */
 	public static void main(String[] args) throws NoSuchAlgorithmException, IOException{
-		AuthorizationServer CR = new AuthorizationServer(new RsaKey());
+		AuthorizationServer AS = new AuthorizationServer(new RsaKey());
 	}
 	
 }

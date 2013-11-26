@@ -5,13 +5,16 @@ import java.net.ServerSocket;
 
 import crypto.RsaKey;
 
+/**
+ * Class to create the Authorization server: it initializes the socket. 
+ */
 public class AuthorizationServer {
 
 	private ServerSocket myService;
 
 	/**
-	 * Constructor: create the server.
-	 * @param rsaKey
+	 * Constructor: create the Authorization Server.
+	 * @param rsaKey the pair of keys (public and private) RSA.
 	 * @throws IOException
 	 */
 	public AuthorizationServer(RsaKey rsaKey) throws IOException{
@@ -20,7 +23,9 @@ public class AuthorizationServer {
 	}
 
 	/**
-	 * Accepts connection with clients.
+	 * Server: accepts connection with clients. 
+	 * Runs the thread that identifies the client (with RSA).
+	 * If the client has been identified, it distributes securely a symmetric key (AES).
 	 * @param rsaKey
 	 */
 	private void acceptConnections(RsaKey rsaKey) {
