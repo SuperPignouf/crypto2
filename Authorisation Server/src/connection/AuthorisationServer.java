@@ -24,7 +24,7 @@ import javax.crypto.SecretKey;
 
 import crypto.RsaKey;
 
-public class AuthorisationService implements Runnable {
+public class AuthorisationServer implements Runnable {
 
 	private Socket clientSocket;
 	private RsaKey rsaKey;
@@ -35,7 +35,7 @@ public class AuthorisationService implements Runnable {
 	private int r1, r2;
 	private SecretKey AESBlackboardKey;
 
-	public AuthorisationService(Socket clientSocket, RsaKey rsaKey) {
+	public AuthorisationServer(Socket clientSocket, RsaKey rsaKey) {
 		this.ID = 0;
 		this.clientSocket = clientSocket;
 		this.rsaKey = rsaKey;
@@ -54,25 +54,18 @@ public class AuthorisationService implements Runnable {
 			//printKey();
 
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (InvalidKeyException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (NoSuchAlgorithmException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (NoSuchPaddingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IllegalBlockSizeException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (BadPaddingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

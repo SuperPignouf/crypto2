@@ -77,9 +77,9 @@ public class ToAuthorisationServer {
 
 		if(this.ASID == 0 && receivedR1 == this.r1)result = true; //System.out.println("Client: serveur d'authentification authentifie");
 
-		System.out.println("BLACKBOARD : R2 received from AS" + this.r2);
-		System.out.println("BLACKBOARD : R1 received from AS" + receivedR1);
-		System.out.println("BLACKBOARD : ID received from AS" + this.ASID);
+		System.out.println("BLACKBOARD : R2 received from AS: " + this.r2);
+		System.out.println("BLACKBOARD : R1 received from AS: " + receivedR1);
+		System.out.println("BLACKBOARD : ID received from AS: " + this.ASID);
 		return result;
 	}
 
@@ -94,8 +94,8 @@ public class ToAuthorisationServer {
 		outO.writeObject(encryptedR1);
 		outO.flush();
 		
-		System.out.println("BLACKBOARD : R1 sent to AS" + this.r1);
-		System.out.println("BLACKBOARD : ID sent to AS" + this.ID);
+		System.out.println("BLACKBOARD : R1 sent to AS: " + this.r1);
+		System.out.println("BLACKBOARD : ID sent to AS: " + this.ID);
 	}
 
 	private void printKeys() {
@@ -117,7 +117,7 @@ public class ToAuthorisationServer {
 		ObjectInputStream keyIn = new ObjectInputStream(this.toAS.getInputStream());
 		this.ASPubKey = (PublicKey)keyIn.readObject();
 		
-		System.out.println("BLACKBOARD Cle publique recue du AS:" + this.ASPubKey);
+		System.out.println("BLACKBOARD Cle publique recue du AS: " + this.ASPubKey);
 	}
 
 	private void sendPubKey() throws IOException {
@@ -125,7 +125,7 @@ public class ToAuthorisationServer {
 		outO.writeObject(this.rsaKey.getKeyPair().getPublic());
 		outO.flush();
 		
-		System.out.println("BLACKBOARD Ma cle publique envoyee au AS:" + this.rsaKey.getKeyPair().getPublic());
+		System.out.println("BLACKBOARD Ma cle publique envoyee au AS: " + this.rsaKey.getKeyPair().getPublic());
 	}
 
 	private void initConnection() throws IOException{
