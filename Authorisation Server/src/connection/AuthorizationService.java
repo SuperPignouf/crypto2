@@ -133,8 +133,8 @@ public class AuthorizationService implements Runnable {
 			//System.out.println(r1);
 		}
 		
-		System.out.println("SERVER : ID received from the client: " + this.clientID);
-		System.out.println("SERVER : R1 received from the client: " + this.r1);
+		System.out.println("SERVER: ID received from the client: " + this.clientID);
+		System.out.println("SERVER: R1 received from the client: " + this.r1);
 
 	}
 	
@@ -153,9 +153,9 @@ public class AuthorizationService implements Runnable {
 		outO.writeObject(encryptedR2);
 		outO.flush();
 		
-		System.out.println("SERVER : ID sent to the blackboard: " + this.ID);
-		System.out.println("SERVER : R1 sent to the blackboard: " + this.r1);
-		System.out.println("SERVER : R2 sent to the blackboard: " + this.r2);
+		System.out.println("SERVER: ID sent to the blackboard: " + this.ID);
+		System.out.println("SERVER: R1 sent to the blackboard: " + this.r1);
+		System.out.println("SERVER: R2 sent to the blackboard: " + this.r2);
 	}
 
 	private boolean receiveOnceBackFromService() throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, IOException, ClassNotFoundException {

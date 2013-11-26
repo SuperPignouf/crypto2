@@ -42,6 +42,29 @@ public class ToAuthorisationServer {
 		//printKeys();
 	}
 
+	private void initConnection() throws IOException{
+		toAS = new Socket("localhost", 2442);
+		this.input = new BufferedReader(new InputStreamReader(this.toAS.getInputStream()));
+		this.output = new PrintWriter(new OutputStreamWriter(this.toAS.getOutputStream()));
+	}
+	
+	private void sendPubKey() throws IOException {
+		ObjectOutputStream outO = new ObjectOutputStream(this.toAS.getOutputStream());
+		outO.writeObject(this.rsaKey.getKeyPair().getPublic());
+		outO.flush();
+		
+		System.out.println("BLACKBOARD Ma cle publique envoyee au AS: " + this.rsaKey.getKeyPair().getPublic());
+	}
+	
+	private void receiveASPubKey() throws IOException, ClassNotFoundException {
+		//System.out.println("CLIENT: Attente de reception de cle RSA publique.");
+
+		ObjectInputStream keyIn = new ObjectInputStream(this.toAS.getInputStream());
+		this.ASPubKey = (PublicKey)keyIn.readObject();
+		
+		System.out.println("BLACKBOARD Cle publique recue du AS: " + this.ASPubKey);
+	}
+	
 	private void needhamSchroeder() throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, IOException, BadPaddingException, ClassNotFoundException {
 		boolean ASRecognized = false;
 		Random randomGenerator = new Random();
@@ -98,6 +121,9 @@ public class ToAuthorisationServer {
 		System.out.println("BLACKBOARD : ID sent to AS: " + this.ID);
 	}
 
+	/**
+	 * Prints the key.
+	 */
 	private void printKeys() {
 		System.out.println("CLIENT : ASPubKey: " + this.ASPubKey);
 		System.out.println("CLIENT : My keys : " + this.rsaKey.getKeyPair());
@@ -105,33 +131,14 @@ public class ToAuthorisationServer {
 		System.out.println("CLIENT : My pubKey : " + this.rsaKey.getKeyPair().getPrivate());
 	}
 
+	/**
+	 * Closes the connection.
+	 * @throws IOException
+	 */
 	private void closeConnection() throws IOException {
 		this.output.close();
 		this.input.close();
 		this.toAS.close();
-	}
-
-	private void receiveASPubKey() throws IOException, ClassNotFoundException {
-		//System.out.println("CLIENT: Attente de reception de cle RSA publique.");
-
-		ObjectInputStream keyIn = new ObjectInputStream(this.toAS.getInputStream());
-		this.ASPubKey = (PublicKey)keyIn.readObject();
-		
-		System.out.println("BLACKBOARD Cle publique recue du AS: " + this.ASPubKey);
-	}
-
-	private void sendPubKey() throws IOException {
-		ObjectOutputStream outO = new ObjectOutputStream(this.toAS.getOutputStream());
-		outO.writeObject(this.rsaKey.getKeyPair().getPublic());
-		outO.flush();
-		
-		System.out.println("BLACKBOARD Ma cle publique envoyee au AS: " + this.rsaKey.getKeyPair().getPublic());
-	}
-
-	private void initConnection() throws IOException{
-		toAS = new Socket("localhost", 2442);
-		this.input = new BufferedReader(new InputStreamReader(this.toAS.getInputStream()));
-		this.output = new PrintWriter(new OutputStreamWriter(this.toAS.getOutputStream()));
 	}
 
 }
