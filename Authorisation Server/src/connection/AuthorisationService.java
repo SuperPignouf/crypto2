@@ -46,6 +46,7 @@ public class AuthorisationService implements Runnable {
 			receiveClientPubKey();
 			needhamSchroeder();
 			closeConnection();
+			printKey();
 
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -69,6 +70,14 @@ public class AuthorisationService implements Runnable {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+
+	private void printKey() {
+		System.out.println("SERVER: My keys:" + this.rsaKey.getKeyPair());
+		System.out.println("SERVER: My private:" + this.rsaKey.getKeyPair().getPrivate());
+		System.out.println("SERVER: My public:" + this.rsaKey.getKeyPair().getPublic());
+		System.out.println("SERVER: My private:" + this.rsaKey.getKeyPair().getPrivate());
+		
 	}
 
 	private void needhamSchroeder() throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, IOException, ClassNotFoundException {
@@ -95,7 +104,7 @@ public class AuthorisationService implements Runnable {
 		int receivedR2 = (Integer)encryptedR2.getObject(cipher);
 		if(this.clientID == 1 && receivedR2 == this.r2) result = true;
 
-		//System.out.println(clientPubKey);
+		System.out.println(clientPubKey);
 		return result;
 	}
 
@@ -124,10 +133,10 @@ public class AuthorisationService implements Runnable {
 		SealedObject clientEncryptedID = (SealedObject)in.readObject();
 		this.clientID = (Integer)clientEncryptedID.getObject(cipher);
 		if(this.clientID == 1){ // Cas du blackboard
-			//System.out.println("Server: BlackBoard detected");
+			System.out.println("Server: BlackBoard detected");
 			SealedObject EncryptedR1 = (SealedObject)in.readObject();
 			this.r1 = (Integer)EncryptedR1.getObject(cipher);
-			//System.out.println(r1);
+			System.out.println(r1);
 		}
 
 	}
@@ -152,13 +161,11 @@ public class AuthorisationService implements Runnable {
 		ObjectOutputStream outO = new ObjectOutputStream(this.clientSocket.getOutputStream());
 		outO.writeObject(this.rsaKey.getKeyPair().getPublic());
 		outO.flush();
-
 	}
 
 	private void initConnection() throws IOException {
 		input = new BufferedReader(new InputStreamReader(this.clientSocket.getInputStream()));
 		this.output = new PrintWriter(new OutputStreamWriter(this.clientSocket.getOutputStream()));
-
 	}
 
 }

@@ -12,11 +12,11 @@ public class ConnectionReceiver {
 	public ConnectionReceiver(RsaKey rsaKey) throws IOException{
 		
 		initConnection();
-		while(true) acceptConnection(rsaKey);
+		acceptConnections(rsaKey);
 	}
 
 
-	private void acceptConnection(RsaKey rsaKey) {
+	private void acceptConnections(RsaKey rsaKey) {
 		while(true){			
 			try {
 				AuthorisationService AS = new AuthorisationService(this.myService.accept(), rsaKey);

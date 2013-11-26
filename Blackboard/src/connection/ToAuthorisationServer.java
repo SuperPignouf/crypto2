@@ -39,7 +39,7 @@ public class ToAuthorisationServer {
 		receiveASPubKey();
 		needhamSchroeder();
 		closeConnection();
-		//printKeys();
+		printKeys();
 	}
 
 	private void needhamSchroeder() throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, IOException, BadPaddingException, ClassNotFoundException {
@@ -93,8 +93,10 @@ public class ToAuthorisationServer {
 	}
 
 	private void printKeys() {
-		System.out.println("AS: " + this.ASPubKey);
-		System.out.println("BB: " + this.rsaKey.getKeyPair());
+		System.out.println("CLIENT : ASPubKey: " + this.ASPubKey);
+		System.out.println("CLIENT : My keys : " + this.rsaKey.getKeyPair());
+		System.out.println("CLIENT : My pubKey : " + this.rsaKey.getKeyPair().getPublic());
+		System.out.println("CLIENT : My pubKey : " + this.rsaKey.getKeyPair().getPrivate());
 	}
 
 	private void closeConnection() throws IOException {
