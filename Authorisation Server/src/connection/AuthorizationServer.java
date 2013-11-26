@@ -33,8 +33,6 @@ public class AuthorizationServer {
 			try {
 				AuthorizationService AS = new AuthorizationService(this.myService.accept(), rsaKey);
 				AS.run();
-				
-				System.out.println("SERVER: Connexion entrante !");
 			}
 			catch (IOException e) {
 				System.out.println(e);

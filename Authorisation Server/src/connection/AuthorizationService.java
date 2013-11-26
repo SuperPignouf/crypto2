@@ -44,7 +44,7 @@ public class AuthorizationService implements Runnable {
 	public void run() {
 		try {
 			initPipeConnection();
-			printKey();
+			//printKey();
 			sendPubKey();
 			receiveClientPubKey();
 			needhamSchroeder();
