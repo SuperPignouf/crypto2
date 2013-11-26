@@ -179,13 +179,10 @@ public class AuthorizationService implements Runnable {
 	}
 
 	private void receiveClientPubKey() throws IOException, ClassNotFoundException  {
-
 		ObjectInputStream keyIn = new ObjectInputStream(this.clientSocket.getInputStream());
 		this.clientPubKey = (PublicKey)keyIn.readObject();
 
-		System.out.println("SERVER Cle publique du client recue:" + clientPubKey);
-
-
+		System.out.println("SERVER: Public key received from the client: " + clientPubKey);
 	}
 
 	private void sendPubKey() throws IOException {
@@ -193,11 +190,11 @@ public class AuthorizationService implements Runnable {
 		outO.writeObject(this.rsaKey.getKeyPair().getPublic());
 		outO.flush();
 		
-		System.out.println("SERVER Ma cle publique envoyee au client:" + this.rsaKey.getKeyPair().getPublic());
+		System.out.println("SERVER: Public key sent to the client: " + this.rsaKey.getKeyPair().getPublic());
 	}
 
 	private void initPipeConnection() throws IOException {
-		input = new BufferedReader(new InputStreamReader(this.clientSocket.getInputStream()));
+		this.input = new BufferedReader(new InputStreamReader(this.clientSocket.getInputStream()));
 		this.output = new PrintWriter(new OutputStreamWriter(this.clientSocket.getOutputStream()));
 	}
 
