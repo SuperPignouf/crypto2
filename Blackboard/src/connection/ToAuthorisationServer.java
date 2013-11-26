@@ -73,19 +73,22 @@ public class ToAuthorisationServer {
 		ASRecognized = receiveIdAndOnceFromAS();
 		if(ASRecognized) sendOnceBack();
 	}
-
-	private void sendOnceBack() throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, IOException {
+	
+	private void sendIdAndOnce() throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, IOException {
 		Cipher cipher = Cipher.getInstance("RSA");
 		cipher.init(Cipher.ENCRYPT_MODE, this.ASPubKey);
-		SealedObject encryptedR2 = new SealedObject(this.r2, cipher);
-
+		SealedObject encryptedR1 = new SealedObject(this.r1, cipher);
+		SealedObject encryptedID = new SealedObject(this.ID, cipher);
 		ObjectOutputStream outO = new ObjectOutputStream(this.toAS.getOutputStream());
-		outO.writeObject(encryptedR2);
+		outO.writeObject(encryptedID);
+		outO.flush();
+		outO.writeObject(encryptedR1);
 		outO.flush();
 		
-		System.out.println("BLACKBOARD : R2 sent to AS" + this.r2);
+		System.out.println("BLACKBOARD : R1 sent to AS: " + this.r1);
+		System.out.println("BLACKBOARD : ID sent to AS: " + this.ID);
 	}
-
+	
 	private boolean receiveIdAndOnceFromAS() throws IllegalBlockSizeException, BadPaddingException, InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, IOException, ClassNotFoundException {
 		boolean result = false;
 		Cipher cipher = Cipher.getInstance("RSA");
@@ -106,19 +109,16 @@ public class ToAuthorisationServer {
 		return result;
 	}
 
-	private void sendIdAndOnce() throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, IOException {
+	private void sendOnceBack() throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, IOException {
 		Cipher cipher = Cipher.getInstance("RSA");
 		cipher.init(Cipher.ENCRYPT_MODE, this.ASPubKey);
-		SealedObject encryptedR1 = new SealedObject(this.r1, cipher);
-		SealedObject encryptedID = new SealedObject(this.ID, cipher);
+		SealedObject encryptedR2 = new SealedObject(this.r2, cipher);
+
 		ObjectOutputStream outO = new ObjectOutputStream(this.toAS.getOutputStream());
-		outO.writeObject(encryptedID);
-		outO.flush();
-		outO.writeObject(encryptedR1);
+		outO.writeObject(encryptedR2);
 		outO.flush();
 		
-		System.out.println("BLACKBOARD : R1 sent to AS: " + this.r1);
-		System.out.println("BLACKBOARD : ID sent to AS: " + this.ID);
+		System.out.println("BLACKBOARD : R2 sent to AS" + this.r2);
 	}
 
 	/**
