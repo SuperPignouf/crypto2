@@ -24,7 +24,7 @@ import javax.crypto.SecretKey;
 
 import crypto.RsaKey;
 
-public class AuthorisationServer implements Runnable {
+public class AuthorizationService implements Runnable {
 
 	private Socket clientSocket;
 	private RsaKey rsaKey;
@@ -35,7 +35,7 @@ public class AuthorisationServer implements Runnable {
 	private int r1, r2;
 	private SecretKey AESBlackboardKey;
 
-	public AuthorisationServer(Socket clientSocket, RsaKey rsaKey) {
+	public AuthorizationService(Socket clientSocket, RsaKey rsaKey) {
 		this.ID = 0;
 		this.clientSocket = clientSocket;
 		this.rsaKey = rsaKey;

@@ -5,7 +5,7 @@ import java.net.ServerSocket;
 
 import crypto.RsaKey;
 
-public class ConnectionReceiver {
+public class AuthorizationServer {
 
 	private ServerSocket myService;
 
@@ -14,7 +14,7 @@ public class ConnectionReceiver {
 	 * @param rsaKey
 	 * @throws IOException
 	 */
-	public ConnectionReceiver(RsaKey rsaKey) throws IOException{
+	public AuthorizationServer(RsaKey rsaKey) throws IOException{
 		initSocketConnection();
 		acceptConnections(rsaKey);
 	}
@@ -26,7 +26,7 @@ public class ConnectionReceiver {
 	private void acceptConnections(RsaKey rsaKey) {
 		while(true){			
 			try {
-				AuthorisationServer AS = new AuthorisationServer(this.myService.accept(), rsaKey);
+				AuthorizationService AS = new AuthorizationService(this.myService.accept(), rsaKey);
 				AS.run();
 				
 				System.out.println("SERVER: Connexion entrante !");
