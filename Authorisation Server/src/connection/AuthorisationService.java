@@ -46,7 +46,7 @@ public class AuthorisationService implements Runnable {
 
 		try {
 
-			initConnection();
+			initPipeConnection();
 			sendPubKey();
 			receiveClientPubKey();
 			needhamSchroeder();
@@ -201,7 +201,7 @@ public class AuthorisationService implements Runnable {
 		System.out.println("SERVER Ma cle publique envoyee au client:" + this.rsaKey.getKeyPair().getPublic());
 	}
 
-	private void initConnection() throws IOException {
+	private void initPipeConnection() throws IOException {
 		input = new BufferedReader(new InputStreamReader(this.clientSocket.getInputStream()));
 		this.output = new PrintWriter(new OutputStreamWriter(this.clientSocket.getOutputStream()));
 	}
