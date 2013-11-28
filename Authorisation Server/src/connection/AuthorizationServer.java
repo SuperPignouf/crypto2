@@ -1,8 +1,17 @@
 package connection;
 
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
+import java.net.Socket;
+import java.net.UnknownHostException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SealedObject;
 import javax.crypto.SecretKey;
 
 import crypto.RsaKey;
@@ -64,8 +73,31 @@ public class AuthorizationServer {
 
 	// On va se connecter au Web service designe par wsid et 
 	//lui envoyer la cle aes et la clientID pour que client et WS puissent parler
-	public void transmitAESToWS(SecretKey aesKey, int wsid, int clientID) { 
-		// TODO Auto-generated method stub
+	public void transmitAESToWS(SecretKey aesKey, int wsid, int clientID) throws UnknownHostException, IOException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException { 
+		Socket toWS;
+		if (wsid == 1){ // Cas du blackboard
+			toWS = new Socket("localhost", 4224);
+			Cipher cipher = Cipher.getInstance("AES");
+			cipher.init(Cipher.ENCRYPT_MODE, this.bbSessionKey);
+			SealedObject encryptedaesKey = new SealedObject(aesKey.getEncoded(), cipher);
+			ObjectOutputStream outO = new ObjectOutputStream(toWS.getOutputStream());
+			outO.writeObject(encryptedaesKey);
+			
+			outO.close();
+			toWS.close();
+		}
+		else if (wsid == 2){ // Cas du keychain
+			toWS = new Socket("localhost", 4242);
+			Cipher cipher = Cipher.getInstance("AES");
+			cipher.init(Cipher.ENCRYPT_MODE, this.kcSessionKey);
+			SealedObject encryptedaesKey = new SealedObject(aesKey.getEncoded(), cipher);
+			ObjectOutputStream outO = new ObjectOutputStream(toWS.getOutputStream());
+			outO.writeObject(encryptedaesKey);
+			
+			outO.close();
+			toWS.close();
+		}
+		
 		
 	}
 

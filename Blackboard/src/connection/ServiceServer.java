@@ -42,6 +42,17 @@ public class ServiceServer {
 		this.myService = new ServerSocket(4224);
 		
 	}
+	
+	public void addIDAES(int ID, SecretKey AESKey){
+		this.IDAES.add(new IDAES(AESKey, ID));
+	}
+	
+	public void removeIDAES(int ID, SecretKey AESKey){
+		IDAES idaes = new IDAES(AESKey, ID) ;
+		for(IDAES i : this.IDAES){
+			if(i.equals(idaes)) this.IDAES.remove(i);
+		}
+	}
 
 	
 }

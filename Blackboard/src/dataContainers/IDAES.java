@@ -12,6 +12,10 @@ public class IDAES { // Structure de donnees utilisee par le service pour reteni
 		this.setClientID(clientID);
 	}
 
+	public boolean equals(IDAES a){
+		return (this.AES.equals(a.AES) && this.clientID == a.clientID);
+	}
+	
 	public SecretKey getAES() {
 		return AES;
 	}

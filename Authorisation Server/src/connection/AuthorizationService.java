@@ -28,8 +28,6 @@ public class AuthorizationService extends Thread implements Runnable {
 	private AuthorizationServer AS;
 	private Socket clientSocket;
 	private RsaKey rsaKey;
-	private BufferedReader input;
-	private PrintWriter output;
 	private PublicKey clientPubKey;
 	private int ID, clientID, WSID;
 	private int r1, r2, r3;
@@ -45,8 +43,6 @@ public class AuthorizationService extends Thread implements Runnable {
 	@Override
 	public void run() {
 		try {
-			initPipeConnection();
-			//printKey();
 			sendPubKey();
 			receiveClientPubKey();
 			needhamSchroeder();
@@ -68,16 +64,12 @@ public class AuthorizationService extends Thread implements Runnable {
 		}
 	}
 	
-	private void initPipeConnection() throws IOException {
-		this.input = new BufferedReader(new InputStreamReader(this.clientSocket.getInputStream()));
-		this.output = new PrintWriter(new OutputStreamWriter(this.clientSocket.getOutputStream()));
-	}
-	
 	private void sendPubKey() throws IOException { // Envoi cle publique RSA
 		System.out.println("PUBLIC KEYS");
 		ObjectOutputStream outO = new ObjectOutputStream(this.clientSocket.getOutputStream());
 		outO.writeObject(this.rsaKey.getKeyPair().getPublic());
 		outO.flush();
+		outO.close();
 		
 		System.out.println("AS: Public key sent to the client: " + this.rsaKey.getKeyPair().getPublic());
 	}
@@ -85,6 +77,7 @@ public class AuthorizationService extends Thread implements Runnable {
 	private void receiveClientPubKey() throws IOException, ClassNotFoundException  { // Reception cle publique RSA
 		ObjectInputStream keyIn = new ObjectInputStream(this.clientSocket.getInputStream());
 		this.clientPubKey = (PublicKey)keyIn.readObject();
+		keyIn.close();
 
 		System.out.println("AS: Public key received from the client: " + clientPubKey);
 	}
@@ -106,7 +99,7 @@ public class AuthorizationService extends Thread implements Runnable {
 		Random randomGenerator = new Random();
 		this.r2 = randomGenerator.nextInt(1000000);
 		receiveIdAndNonce();
-		if (this.clientID == 1){ // c'est un blackboard
+		if (this.clientID == 1 || this.clientID == 2){ // c'est un WS
 			sendIdAndNoncesToService();
 			partnerRecognized = receiveNonceBackFromClient();
 		}
@@ -122,6 +115,13 @@ public class AuthorizationService extends Thread implements Runnable {
 			System.out.println("AS: Distribution of the symmetric key...");
 			createAndSendAES();
 			this.AS.setBBSessionKey(this.AESKey); // On retient la cle AES pour pouvoir discuter avec le blackboard
+		}
+		else if(this.clientID == 2 && partnerRecognized){
+			System.out.println("AS: KeyChain fully authentified.");
+			System.out.println("\nAES:");
+			System.out.println("AS: Distribution of the symmetric key...");
+			createAndSendAES();
+			this.AS.setKCSessionKey(this.AESKey); // On retient la cle AES pour pouvoir discuter avec le blackboard
 		}
 		else if(this.clientID > 2 && partnerRecognized){
 			System.out.println("AS: User fully authentified.");
@@ -155,6 +155,7 @@ public class AuthorizationService extends Thread implements Runnable {
 		outO.flush();
 		outO.writeObject(encryptedR2);
 		outO.flush();
+		outO.close();
 		
 		System.out.println("AS: ID sent to the blackboard: " + this.ID);
 		System.out.println("AS: WSID sent to the blackboard: " + this.ID);
@@ -171,11 +172,9 @@ public class AuthorizationService extends Thread implements Runnable {
 
 		SealedObject clientEncryptedID = (SealedObject)in.readObject();
 		this.clientID = (Integer)clientEncryptedID.getObject(cipher);
-		if(this.clientID == 1){ // Cas du blackboard
-			//System.out.println("Server: BlackBoard detected");
+		if(this.clientID == 1 || this.clientID == 2){ // Cas du blackboard ou du keychain
 			SealedObject EncryptedR1 = (SealedObject)in.readObject();
 			this.r1 = (Integer)EncryptedR1.getObject(cipher);
-			//System.out.println(r1);
 			System.out.println("AS: ID received from the client: " + this.clientID);
 			System.out.println("AS: R1 received from the client: " + this.r1);
 		}
@@ -189,6 +188,7 @@ public class AuthorizationService extends Thread implements Runnable {
 			System.out.println("AS: R3 received from the client: " + this.r3);
 			System.out.println("AS: Required WS: " + this.WSID);
 		}
+		in.close();
 	}
 	
 	private void sendIdAndNoncesToService() throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, IOException {
@@ -205,6 +205,7 @@ public class AuthorizationService extends Thread implements Runnable {
 		outO.flush();
 		outO.writeObject(encryptedR2);
 		outO.flush();
+		outO.close();
 		
 		System.out.println("AS: ID sent to the blackboard: " + this.ID);
 		System.out.println("AS: R1 sent to the blackboard: " + this.r1);
@@ -223,6 +224,7 @@ public class AuthorizationService extends Thread implements Runnable {
 		if(receivedR2 == this.r2) result = true;
 
 		System.out.println("AS: R2 received from the client: " + receivedR2);
+		in.close();
 		return result;
 	}
 	
@@ -248,27 +250,18 @@ public class AuthorizationService extends Thread implements Runnable {
 		ObjectOutputStream outO = new ObjectOutputStream(this.clientSocket.getOutputStream());
 		outO.writeObject(encryptedAESKey);
 		outO.flush();
+		outO.close();
 
-		System.out.println("AS: Blackboard AES key sent." + this.AESKey);
+		System.out.println("AS: Web Service AES key sent." + this.AESKey);
 
 	}
 	
-	/**
-	 * Prints the key.
-	 */
-	private void printKey() {
-		System.out.println("AS: My keys: " + this.rsaKey.getKeyPair());
-		System.out.println("AS: My private: " + this.rsaKey.getKeyPair().getPrivate());
-		System.out.println("AS: My public: " + this.rsaKey.getKeyPair().getPublic());
-	}
 
 	/**
 	 * Closes the connection.
 	 * @throws IOException
 	 */
 	private void closeConnection() throws IOException {
-		this.output.close();
-		this.input.close();
 		this.clientSocket.close();
 	}
 

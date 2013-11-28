@@ -56,6 +56,7 @@ public class ToAuthorisationServer {
 		ObjectOutputStream outO = new ObjectOutputStream(this.toAS.getOutputStream());
 		outO.writeObject(this.rsaKey.getKeyPair().getPublic());
 		outO.flush();
+		outO.close();
 		
 		System.out.println("BLACKBOARD: Public key sent to the authorization server: " + this.rsaKey.getKeyPair().getPublic());
 	}
@@ -65,6 +66,7 @@ public class ToAuthorisationServer {
 
 		ObjectInputStream keyIn = new ObjectInputStream(this.toAS.getInputStream());
 		this.ASPubKey = (PublicKey)keyIn.readObject();
+		keyIn.close();
 		
 		System.out.println("BLACKBOARD: Public key received from the server: " + this.ASPubKey);
 	}
@@ -91,6 +93,7 @@ public class ToAuthorisationServer {
 		byte[] SessionKey = new byte[32];
 		SessionKey = (byte[]) EncryptedSessionKey.getObject(cipher);
 		this.ASAESKey = new SecretKeySpec(SessionKey, 0, 32, "AES");
+		in.close();
 		
 		System.out.println("BB : received AES key (AS-BB)" + this.ASAESKey);
 	}
@@ -105,6 +108,7 @@ public class ToAuthorisationServer {
 		outO.flush();
 		outO.writeObject(encryptedR1);
 		outO.flush();
+		outO.close();
 		
 		System.out.println("BLACKBOARD: ID sent to the AS: " + this.ID);
 		System.out.println("BLACKBOARD: R1 sent to the AS: " + this.r1);
@@ -127,7 +131,7 @@ public class ToAuthorisationServer {
 		System.out.println("BLACKBOARD: ID received from the AS: " + this.ASID);
 		System.out.println("BLACKBOARD: R1 received from the AS: " + receivedR1);
 		System.out.println("BLACKBOARD: R2 received from the AS: " + this.r2);
-		
+		in.close();
 		return result;
 	}
 
@@ -139,6 +143,7 @@ public class ToAuthorisationServer {
 		ObjectOutputStream outO = new ObjectOutputStream(this.toAS.getOutputStream());
 		outO.writeObject(encryptedR2);
 		outO.flush();
+		outO.close();
 		
 		System.out.println("BLACKBOARD: R2 sent to the AS: " + this.r2);
 	}
