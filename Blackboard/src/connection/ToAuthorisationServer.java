@@ -19,6 +19,7 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SealedObject;
 import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 
 import crypto.RsaKey;
 
@@ -82,9 +83,16 @@ public class ToAuthorisationServer {
 		}
 	}
 	
-	private void receiveAESSessionKey() {
-		// TODO Auto-generated method stub
+	private void receiveAESSessionKey() throws IOException, ClassNotFoundException, InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException {
+		Cipher cipher = Cipher.getInstance("RSA");
+		cipher.init(Cipher.DECRYPT_MODE, this.rsaKey.getKeyPair().getPrivate());
+		ObjectInputStream in = new ObjectInputStream(this.toAS.getInputStream());
+		SealedObject EncryptedSessionKey = (SealedObject)in.readObject();
+		byte[] SessionKey = new byte[32];
+		SessionKey = (byte[]) EncryptedSessionKey.getObject(cipher);
+		this.ASAESKey = new SecretKeySpec(SessionKey, 0, 32, "AES");
 		
+		System.out.println("BB : received AES key (AS-BB)" + this.ASAESKey);
 	}
 
 	private void sendIdAndNonce() throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, IOException {

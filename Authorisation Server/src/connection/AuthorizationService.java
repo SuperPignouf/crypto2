@@ -236,22 +236,19 @@ public class AuthorizationService implements Runnable {
 	 */
 	private void createAndSendAES() throws NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, IOException, InvalidKeyException, BadPaddingException {
 		KeyGenerator keyGen = KeyGenerator.getInstance("AES");
-		keyGen.init(128);
+		keyGen.init(256);
 		this.AESServiceKey = keyGen.generateKey();
 
 		Cipher cipher = Cipher.getInstance("RSA");
 		cipher.init(Cipher.ENCRYPT_MODE, this.clientPubKey);
 		
-		//byte[] encryptedAESBlackboardKey = cipher.doFinal(this.AESBlackboardKey.getEncoded());
-		
-		//this.AESServiceKey.
 		SealedObject encryptedAESServiceKey = new SealedObject(this.AESServiceKey.getEncoded(), cipher);
 		
 		ObjectOutputStream outO = new ObjectOutputStream(this.clientSocket.getOutputStream());
 		outO.writeObject(encryptedAESServiceKey);
 		outO.flush();
 
-		System.out.println("AS: Blackboard AES key sent.");
+		System.out.println("AS: Blackboard AES key sent." + this.AESServiceKey);
 
 	}
 	
