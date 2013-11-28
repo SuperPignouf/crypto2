@@ -3,6 +3,8 @@ package connection;
 import java.io.IOException;
 import java.net.ServerSocket;
 
+import javax.crypto.SecretKey;
+
 import crypto.RsaKey;
 
 /**
@@ -10,6 +12,8 @@ import crypto.RsaKey;
  */
 public class AuthorizationServer {
 
+	private SecretKey bbSessionKey;
+	private SecretKey kcSessionKey;
 	private ServerSocket myService;
 
 	/**
@@ -48,6 +52,21 @@ public class AuthorizationServer {
 	 */
 	private void initSocketConnection() throws IOException {
 		this.myService = new ServerSocket(2442);
+	}
+
+	public void setBBSessionKey(SecretKey aesServiceKey) {
+		this.bbSessionKey = aesServiceKey;	
+	}
+	
+	public void setKCSessionKey(SecretKey aesServiceKey) {
+		this.kcSessionKey = aesServiceKey;	
+	}
+
+	// On va se connecter au Web service designe par wsid et 
+	//lui envoyer la cle aes et la clientID pour que client et WS puissent parler
+	public void transmitAESToWS(SecretKey aesKey, int wsid, int clientID) { 
+		// TODO Auto-generated method stub
+		
 	}
 
 }

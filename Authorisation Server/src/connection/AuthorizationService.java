@@ -23,7 +23,7 @@ import javax.crypto.SecretKey;
 
 import crypto.RsaKey;
 
-public class AuthorizationService implements Runnable {
+public class AuthorizationService extends Thread implements Runnable {
 
 	private AuthorizationServer AS;
 	private Socket clientSocket;
@@ -33,7 +33,7 @@ public class AuthorizationService implements Runnable {
 	private PublicKey clientPubKey;
 	private int ID, clientID, WSID;
 	private int r1, r2, r3;
-	private SecretKey AESServiceKey;
+	private SecretKey AESKey;
 
 	public AuthorizationService(Socket clientSocket, RsaKey rsaKey, AuthorizationServer AS) {
 		this.AS = AS;
@@ -73,7 +73,7 @@ public class AuthorizationService implements Runnable {
 		this.output = new PrintWriter(new OutputStreamWriter(this.clientSocket.getOutputStream()));
 	}
 	
-	private void sendPubKey() throws IOException {
+	private void sendPubKey() throws IOException { // Envoi cle publique RSA
 		System.out.println("PUBLIC KEYS");
 		ObjectOutputStream outO = new ObjectOutputStream(this.clientSocket.getOutputStream());
 		outO.writeObject(this.rsaKey.getKeyPair().getPublic());
@@ -82,7 +82,7 @@ public class AuthorizationService implements Runnable {
 		System.out.println("AS: Public key sent to the client: " + this.rsaKey.getKeyPair().getPublic());
 	}
 	
-	private void receiveClientPubKey() throws IOException, ClassNotFoundException  {
+	private void receiveClientPubKey() throws IOException, ClassNotFoundException  { // Reception cle publique RSA
 		ObjectInputStream keyIn = new ObjectInputStream(this.clientSocket.getInputStream());
 		this.clientPubKey = (PublicKey)keyIn.readObject();
 
@@ -106,11 +106,11 @@ public class AuthorizationService implements Runnable {
 		Random randomGenerator = new Random();
 		this.r2 = randomGenerator.nextInt(1000000);
 		receiveIdAndNonce();
-		if (this.clientID == 1){
+		if (this.clientID == 1){ // c'est un blackboard
 			sendIdAndNoncesToService();
 			partnerRecognized = receiveNonceBackFromClient();
 		}
-		else if (this.clientID > 2){
+		else if (this.clientID > 2){ // C'est un user
 			sendIdAndNoncesToUser();
 			partnerRecognized = (receiveNonceBackFromClient() && legitimateUser());
 		}
@@ -121,18 +121,19 @@ public class AuthorizationService implements Runnable {
 			System.out.println("\nAES:");
 			System.out.println("AS: Distribution of the symmetric key...");
 			createAndSendAES();
-			//this.AS.setBBSessionKey(this.AESServiceKey);
+			this.AS.setBBSessionKey(this.AESKey); // On retient la cle AES pour pouvoir discuter avec le blackboard
 		}
 		else if(this.clientID > 2 && partnerRecognized){
 			System.out.println("AS: User fully authentified.");
 			System.out.println("\nAES:");
 			System.out.println("AS: Distribution of the symmetric key...");
-			//createAndSendAES();
+			createAndSendAES();
+			this.AS.transmitAESToWS(this.AESKey, this.WSID, this.clientID); // On transfere le clientID et la cle AES au Web service designe par WebServiceID
 		}
 	}
 	
 
-	private boolean legitimateUser() {
+	private boolean legitimateUser() { // Acces a la bdd + demande eventuelle de mot de passe pour verifier l'identite de l'utilisateur
 		// Cette methode va aller voir dans la base de donnees si le user qui tente la connexion est bien enregistre.
 		return true;
 	}
@@ -237,18 +238,18 @@ public class AuthorizationService implements Runnable {
 	private void createAndSendAES() throws NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, IOException, InvalidKeyException, BadPaddingException {
 		KeyGenerator keyGen = KeyGenerator.getInstance("AES");
 		keyGen.init(256);
-		this.AESServiceKey = keyGen.generateKey();
+		this.AESKey = keyGen.generateKey();
 
 		Cipher cipher = Cipher.getInstance("RSA");
 		cipher.init(Cipher.ENCRYPT_MODE, this.clientPubKey);
 		
-		SealedObject encryptedAESServiceKey = new SealedObject(this.AESServiceKey.getEncoded(), cipher);
+		SealedObject encryptedAESKey = new SealedObject(this.AESKey.getEncoded(), cipher);
 		
 		ObjectOutputStream outO = new ObjectOutputStream(this.clientSocket.getOutputStream());
-		outO.writeObject(encryptedAESServiceKey);
+		outO.writeObject(encryptedAESKey);
 		outO.flush();
 
-		System.out.println("AS: Blackboard AES key sent." + this.AESServiceKey);
+		System.out.println("AS: Blackboard AES key sent." + this.AESKey);
 
 	}
 	
