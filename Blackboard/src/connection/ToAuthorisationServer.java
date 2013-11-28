@@ -18,6 +18,7 @@ import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SealedObject;
+import javax.crypto.SecretKey;
 
 import crypto.RsaKey;
 
@@ -30,6 +31,7 @@ public class ToAuthorisationServer {
 	private PublicKey ASPubKey;
 	private int ID, ASID;
 	private int r1, r2;
+	private SecretKey ASAESKey;
 
 	public 	ToAuthorisationServer(RsaKey rsaKey) throws IOException, ClassNotFoundException, InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException{
 		this.ID = 1;
@@ -74,9 +76,17 @@ public class ToAuthorisationServer {
 		this.r1 = randomGenerator.nextInt(1000000);
 		sendIdAndNonce();
 		ASRecognized = receiveIdAndNonceFromAS();
-		if(ASRecognized) sendNonceBack();
+		if(ASRecognized) {
+			sendNonceBack();
+			receiveAESSessionKey();
+		}
 	}
 	
+	private void receiveAESSessionKey() {
+		// TODO Auto-generated method stub
+		
+	}
+
 	private void sendIdAndNonce() throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, IOException {
 		Cipher cipher = Cipher.getInstance("RSA");
 		cipher.init(Cipher.ENCRYPT_MODE, this.ASPubKey);
@@ -143,6 +153,10 @@ public class ToAuthorisationServer {
 		this.output.close();
 		this.input.close();
 		this.toAS.close();
+	}
+
+	public SecretKey getASAESKey() {
+		return this.ASAESKey;
 	}
 
 }

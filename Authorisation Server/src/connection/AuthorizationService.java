@@ -25,16 +25,18 @@ import crypto.RsaKey;
 
 public class AuthorizationService implements Runnable {
 
+	private AuthorizationServer AS;
 	private Socket clientSocket;
 	private RsaKey rsaKey;
 	private BufferedReader input;
 	private PrintWriter output;
 	private PublicKey clientPubKey;
-	private int ID, clientID;
-	private int r1, r2;
-	private SecretKey AESBlackboardKey;
+	private int ID, clientID, WSID;
+	private int r1, r2, r3;
+	private SecretKey AESServiceKey;
 
-	public AuthorizationService(Socket clientSocket, RsaKey rsaKey) {
+	public AuthorizationService(Socket clientSocket, RsaKey rsaKey, AuthorizationServer AS) {
+		this.AS = AS;
 		this.ID = 0;
 		this.clientSocket = clientSocket;
 		this.rsaKey = rsaKey;
@@ -106,18 +108,60 @@ public class AuthorizationService implements Runnable {
 		receiveIdAndNonce();
 		if (this.clientID == 1){
 			sendIdAndNoncesToService();
-			partnerRecognized = receiveNonceBackFromService();
+			partnerRecognized = receiveNonceBackFromClient();
 		}
-		//if (partnerRecognized) System.out.println("Server: Partner recognized");
+		else if (this.clientID > 2){
+			sendIdAndNoncesToUser();
+			partnerRecognized = (receiveNonceBackFromClient() && legitimateUser());
+		}
+		
 		
 		if(this.clientID == 1 && partnerRecognized){
 			System.out.println("AS: Blackboard fully authentified.");
 			System.out.println("\nAES:");
 			System.out.println("AS: Distribution of the symmetric key...");
 			createAndSendAES();
+			//this.AS.setBBSessionKey(this.AESServiceKey);
+		}
+		else if(this.clientID > 2 && partnerRecognized){
+			System.out.println("AS: User fully authentified.");
+			System.out.println("\nAES:");
+			System.out.println("AS: Distribution of the symmetric key...");
+			//createAndSendAES();
 		}
 	}
 	
+
+	private boolean legitimateUser() {
+		// Cette methode va aller voir dans la base de donnees si le user qui tente la connexion est bien enregistre.
+		return true;
+	}
+
+	private void sendIdAndNoncesToUser() throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, IOException {
+		Cipher cipher = Cipher.getInstance("RSA");
+		cipher.init(Cipher.ENCRYPT_MODE, this.clientPubKey);
+		SealedObject encryptedID = new SealedObject(this.ID, cipher);
+		SealedObject encryptedWSID = new SealedObject(this.WSID, cipher);
+		SealedObject encryptedR3 = new SealedObject(this.r3, cipher);
+		SealedObject encryptedR2 = new SealedObject(this.r2, cipher);
+
+		ObjectOutputStream outO = new ObjectOutputStream(this.clientSocket.getOutputStream());
+		outO.writeObject(encryptedID);
+		outO.flush();
+		outO.writeObject(encryptedWSID);
+		outO.flush();
+		outO.writeObject(encryptedR3);
+		outO.flush();
+		outO.writeObject(encryptedR2);
+		outO.flush();
+		
+		System.out.println("AS: ID sent to the blackboard: " + this.ID);
+		System.out.println("AS: WSID sent to the blackboard: " + this.ID);
+		System.out.println("AS: R3 sent to the blackboard: " + this.r3);
+		System.out.println("AS: R4 sent to the blackboard: " + this.r2);
+		
+	}
+
 	private void receiveIdAndNonce() throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, IOException, ClassNotFoundException {
 		Cipher cipher = Cipher.getInstance("RSA");
 		cipher.init(Cipher.DECRYPT_MODE, this.rsaKey.getKeyPair().getPrivate());
@@ -131,11 +175,19 @@ public class AuthorizationService implements Runnable {
 			SealedObject EncryptedR1 = (SealedObject)in.readObject();
 			this.r1 = (Integer)EncryptedR1.getObject(cipher);
 			//System.out.println(r1);
+			System.out.println("AS: ID received from the client: " + this.clientID);
+			System.out.println("AS: R1 received from the client: " + this.r1);
 		}
-		
-		System.out.println("AS: ID received from the client: " + this.clientID);
-		System.out.println("AS: R1 received from the client: " + this.r1);
-
+		else if(this.clientID > 2){ // Cas d'un utilisateur
+			SealedObject EncryptedWSID = (SealedObject)in.readObject();
+			this.WSID = (Integer)EncryptedWSID.getObject(cipher);
+			SealedObject EncryptedR3 = (SealedObject)in.readObject();
+			this.r3 = (Integer)EncryptedR3.getObject(cipher);
+			
+			System.out.println("AS: ID received from the client: " + this.clientID);
+			System.out.println("AS: R3 received from the client: " + this.r3);
+			System.out.println("AS: Required WS: " + this.WSID);
+		}
 	}
 	
 	private void sendIdAndNoncesToService() throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, IOException {
@@ -158,7 +210,7 @@ public class AuthorizationService implements Runnable {
 		System.out.println("AS: R2 sent to the blackboard: " + this.r2);
 	}
 
-	private boolean receiveNonceBackFromService() throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, IOException, ClassNotFoundException {
+	private boolean receiveNonceBackFromClient() throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, IOException, ClassNotFoundException {
 		boolean result = false;
 		Cipher cipher = Cipher.getInstance("RSA");
 		cipher.init(Cipher.DECRYPT_MODE, this.rsaKey.getKeyPair().getPrivate());
@@ -167,7 +219,7 @@ public class AuthorizationService implements Runnable {
 
 		SealedObject encryptedR2 = (SealedObject)in.readObject();
 		int receivedR2 = (Integer)encryptedR2.getObject(cipher);
-		if(this.clientID == 1 && receivedR2 == this.r2) result = true;
+		if(receivedR2 == this.r2) result = true;
 
 		System.out.println("AS: R2 received from the client: " + receivedR2);
 		return result;
@@ -185,17 +237,18 @@ public class AuthorizationService implements Runnable {
 	private void createAndSendAES() throws NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, IOException, InvalidKeyException, BadPaddingException {
 		KeyGenerator keyGen = KeyGenerator.getInstance("AES");
 		keyGen.init(128);
-		this.AESBlackboardKey = keyGen.generateKey();
+		this.AESServiceKey = keyGen.generateKey();
 
 		Cipher cipher = Cipher.getInstance("RSA");
 		cipher.init(Cipher.ENCRYPT_MODE, this.clientPubKey);
 		
 		//byte[] encryptedAESBlackboardKey = cipher.doFinal(this.AESBlackboardKey.getEncoded());
 		
-		SealedObject encryptedAESBlackboardKey = new SealedObject(this.AESBlackboardKey, cipher);
+		//this.AESServiceKey.
+		SealedObject encryptedAESServiceKey = new SealedObject(this.AESServiceKey.getEncoded(), cipher);
 		
 		ObjectOutputStream outO = new ObjectOutputStream(this.clientSocket.getOutputStream());
-		outO.writeObject(encryptedAESBlackboardKey);
+		outO.writeObject(encryptedAESServiceKey);
 		outO.flush();
 
 		System.out.println("AS: Blackboard AES key sent.");
