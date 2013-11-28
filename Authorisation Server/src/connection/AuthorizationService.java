@@ -77,14 +77,14 @@ public class AuthorizationService implements Runnable {
 		outO.writeObject(this.rsaKey.getKeyPair().getPublic());
 		outO.flush();
 		
-		System.out.println("SERVER: Public key sent to the client: " + this.rsaKey.getKeyPair().getPublic());
+		System.out.println("AS: Public key sent to the client: " + this.rsaKey.getKeyPair().getPublic());
 	}
 	
 	private void receiveClientPubKey() throws IOException, ClassNotFoundException  {
 		ObjectInputStream keyIn = new ObjectInputStream(this.clientSocket.getInputStream());
 		this.clientPubKey = (PublicKey)keyIn.readObject();
 
-		System.out.println("SERVER: Public key received from the client: " + clientPubKey);
+		System.out.println("AS: Public key received from the client: " + clientPubKey);
 	}
 
 	/**
@@ -111,9 +111,9 @@ public class AuthorizationService implements Runnable {
 		//if (partnerRecognized) System.out.println("Server: Partner recognized");
 		
 		if(this.clientID == 1 && partnerRecognized){
-			System.out.println("SERVER: Blackboard fully authentified.");
+			System.out.println("AS: Blackboard fully authentified.");
 			System.out.println("\nAES:");
-			System.out.println("SERVER: Distribution of the symmetric key...");
+			System.out.println("AS: Distribution of the symmetric key...");
 			createAndSendAES();
 		}
 	}
@@ -133,8 +133,8 @@ public class AuthorizationService implements Runnable {
 			//System.out.println(r1);
 		}
 		
-		System.out.println("SERVER: ID received from the client: " + this.clientID);
-		System.out.println("SERVER: R1 received from the client: " + this.r1);
+		System.out.println("AS: ID received from the client: " + this.clientID);
+		System.out.println("AS: R1 received from the client: " + this.r1);
 
 	}
 	
@@ -153,9 +153,9 @@ public class AuthorizationService implements Runnable {
 		outO.writeObject(encryptedR2);
 		outO.flush();
 		
-		System.out.println("SERVER: ID sent to the blackboard: " + this.ID);
-		System.out.println("SERVER: R1 sent to the blackboard: " + this.r1);
-		System.out.println("SERVER: R2 sent to the blackboard: " + this.r2);
+		System.out.println("AS: ID sent to the blackboard: " + this.ID);
+		System.out.println("AS: R1 sent to the blackboard: " + this.r1);
+		System.out.println("AS: R2 sent to the blackboard: " + this.r2);
 	}
 
 	private boolean receiveNonceBackFromService() throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, IOException, ClassNotFoundException {
@@ -169,7 +169,7 @@ public class AuthorizationService implements Runnable {
 		int receivedR2 = (Integer)encryptedR2.getObject(cipher);
 		if(this.clientID == 1 && receivedR2 == this.r2) result = true;
 
-		System.out.println("SERVER: R2 received from the client: " + receivedR2);
+		System.out.println("AS: R2 received from the client: " + receivedR2);
 		return result;
 	}
 	
@@ -198,7 +198,7 @@ public class AuthorizationService implements Runnable {
 		outO.writeObject(encryptedAESBlackboardKey);
 		outO.flush();
 
-		System.out.println("SERVER: Blackboard AES key sent.");
+		System.out.println("AS: Blackboard AES key sent.");
 
 	}
 	
@@ -206,9 +206,9 @@ public class AuthorizationService implements Runnable {
 	 * Prints the key.
 	 */
 	private void printKey() {
-		System.out.println("SERVER: My keys: " + this.rsaKey.getKeyPair());
-		System.out.println("SERVER: My private: " + this.rsaKey.getKeyPair().getPrivate());
-		System.out.println("SERVER: My public: " + this.rsaKey.getKeyPair().getPublic());
+		System.out.println("AS: My keys: " + this.rsaKey.getKeyPair());
+		System.out.println("AS: My private: " + this.rsaKey.getKeyPair().getPrivate());
+		System.out.println("AS: My public: " + this.rsaKey.getKeyPair().getPublic());
 	}
 
 	/**
