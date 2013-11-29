@@ -23,6 +23,7 @@ public class RsaKey {
 		}
 		keyPairGenerator.initialize(1024); //1024 bits
 		this.keyPair = keyPairGenerator.genKeyPair();
+		//System.out.println("LOOK HERE : " + this.keyPair.getPublic().getEncoded().length);
 	}
 
 	/**
