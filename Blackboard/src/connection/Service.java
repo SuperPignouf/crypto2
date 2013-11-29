@@ -20,7 +20,7 @@ public class Service extends Thread implements Runnable {
 	private SecretKey ASAES;
 
 	public Service(Socket accept, SecretKey aSAESKey) {
-		this.ID = 0;
+		this.ID = 1;
 		this.clientSocket = accept;
 		this.ASAES = aSAESKey;
 	}
@@ -57,9 +57,11 @@ public class Service extends Thread implements Runnable {
 		
 	}
 
-	private void receiveUserIDAndSessionKey() {
-		// TODO Auto-generated method stub
-		
+	private void receiveUserIDAndSessionKey() throws IOException, ClassNotFoundException {
+		ObjectInputStream in = new ObjectInputStream(this.clientSocket.getInputStream());
+		SealedObject encryptedUserID = (SealedObject) in.readObject();
+		SealedObject encryptedAESKey = (SealedObject) in.readObject();
+		SealedObject encryptedCryptoperiod = (SealedObject) in.readObject();
 	}
 
 	private int identifyClient() throws IOException, ClassNotFoundException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException {
