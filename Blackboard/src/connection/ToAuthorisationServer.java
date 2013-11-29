@@ -11,7 +11,7 @@ import java.net.Socket;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
-import java.util.Random;
+import java.security.SecureRandom;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -67,7 +67,7 @@ public class ToAuthorisationServer {
 		System.out.println("\n\nNEEDHAM-SCHROEDER PROTOCOL:");
 		System.out.println("RSA:");
 		boolean ASRecognized = false;
-		Random randomGenerator = new Random();
+		SecureRandom randomGenerator = new SecureRandom();
 		this.r1 = randomGenerator.nextInt(1000000);
 		sendIdAndNonce();
 		ASRecognized = receiveIdAndNonceFromAS();
