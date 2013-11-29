@@ -29,7 +29,7 @@ public class AuthorizationService extends Thread implements Runnable {
 	private Socket clientSocket;
 	private RsaKey rsaKey;
 	private PublicKey clientPubKey;
-	private int ID, clientID, WSID;
+	private int ID, clientID, WSID; // ID personnelle, ID du client, ID du web service demande par le client (dans le cas ou le client est un user)
 	private int r1, r2, r3;
 	private SecretKey AESKey;
 
@@ -190,8 +190,7 @@ public class AuthorizationService extends Thread implements Runnable {
 
 		ObjectInputStream in = new ObjectInputStream(this.clientSocket.getInputStream());
 
-		SealedObject clientEncryptedID = (SealedObject)in.readObject();
-		this.clientID = (Integer)clientEncryptedID.getObject(cipher);
+		this.clientID = (Integer)in.readObject();
 		if(this.clientID == 1 || this.clientID == 2){ // Cas du blackboard ou du keychain
 			SealedObject EncryptedR1 = (SealedObject)in.readObject();
 			this.r1 = (Integer)EncryptedR1.getObject(cipher);
@@ -199,8 +198,7 @@ public class AuthorizationService extends Thread implements Runnable {
 			System.out.println("AS: R1 received from the client: " + this.r1);
 		}
 		else if(this.clientID > 2){ // Cas d'un utilisateur
-			SealedObject EncryptedWSID = (SealedObject)in.readObject();
-			this.WSID = (Integer)EncryptedWSID.getObject(cipher);
+			this.WSID = (Integer)in.readObject();
 			SealedObject EncryptedR3 = (SealedObject)in.readObject();
 			this.r3 = (Integer)EncryptedR3.getObject(cipher);
 			

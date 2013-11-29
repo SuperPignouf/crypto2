@@ -10,6 +10,7 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
+
 import dataContainers.IDAES;
 import crypto.RsaKey;
 
@@ -31,7 +32,7 @@ public class ServiceServer {
 			try {
 				//Service BB = new Service(this.myService.accept());
 				//BB.run();
-				new Service(this.myService.accept(), this.ASAESKey).run();
+				new Service(this.myService.accept(), this.ASAESKey, this).run();
 			}
 			catch (IOException e) {
 				System.out.println(e);
@@ -44,12 +45,12 @@ public class ServiceServer {
 		
 	}
 	
-	public void addIDAES(int ID, SecretKey AESKey){
-		this.IDAES.add(new IDAES(AESKey, ID));
+	public void addIDAES(int ID, int cryptoPeriod, SecretKey AESKey){
+		this.IDAES.add(new IDAES(AESKey, cryptoPeriod, ID));
 	}
 	
 	public void removeIDAES(int ID, SecretKey AESKey){
-		IDAES idaes = new IDAES(AESKey, ID) ;
+		IDAES idaes = new IDAES(AESKey, 0, ID) ;
 		for(IDAES i : this.IDAES){
 			if(i.equals(idaes)) this.IDAES.remove(i);
 		}
@@ -57,6 +58,14 @@ public class ServiceServer {
 
 	public void setASAES(SecretKey asaesKey) {
 		this.ASAESKey = asaesKey;
+		
+	}
+	
+	public IDAES getIDAES(int id){
+		for(IDAES i : this.IDAES){
+			if(i.getClientID() == id) return i;
+		}
+		return null;
 		
 	}
 

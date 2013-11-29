@@ -6,10 +6,12 @@ public class IDAES { // Structure de donnees utilisee par le service pour reteni
 
 	private SecretKey AES;
 	private int clientID;
+	private int cryptoPeriod;
 	
-	public IDAES(SecretKey AES, int clientID){
+	public IDAES(SecretKey AES, int clientID, int cryptoPeriod){
 		this.setAES(AES);
 		this.setClientID(clientID);
+		this.setCryptoPeriod(cryptoPeriod);
 	}
 
 	public boolean equals(IDAES a){
@@ -30,6 +32,14 @@ public class IDAES { // Structure de donnees utilisee par le service pour reteni
 
 	public void setClientID(int clientID) {
 		this.clientID = clientID;
+	}
+
+	public int getCryptoPeriod() {
+		return cryptoPeriod;
+	}
+
+	public void setCryptoPeriod(int cryptoPeriod) {
+		this.cryptoPeriod = cryptoPeriod;
 	}
 	
 }

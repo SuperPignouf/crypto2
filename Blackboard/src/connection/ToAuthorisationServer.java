@@ -100,9 +100,8 @@ public class ToAuthorisationServer {
 		Cipher cipher = Cipher.getInstance("RSA");
 		cipher.init(Cipher.ENCRYPT_MODE, this.ASPubKey);
 		SealedObject encryptedR1 = new SealedObject(this.r1, cipher);
-		SealedObject encryptedID = new SealedObject(this.ID, cipher);
 		ObjectOutputStream outO = new ObjectOutputStream(this.toAS.getOutputStream());
-		outO.writeObject(encryptedID);
+		outO.writeObject(this.ID);
 		outO.flush();
 		outO.writeObject(encryptedR1);
 		outO.flush();
