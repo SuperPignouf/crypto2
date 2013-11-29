@@ -23,7 +23,12 @@ public class ToAuthorisationServer {
 		catch (IOException e) {
 			System.out.println(e);
 		}
-
+		
+		this.protocol();
+	}
+	
+	void protocol() {
+		
 	}
 
 }
