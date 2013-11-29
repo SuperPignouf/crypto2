@@ -69,7 +69,6 @@ public class AuthorizationService extends Thread implements Runnable {
 		ObjectOutputStream outO = new ObjectOutputStream(this.clientSocket.getOutputStream());
 		outO.writeObject(this.rsaKey.getKeyPair().getPublic());
 		outO.flush();
-		outO.close();
 		
 		System.out.println("AS: Public key sent to the client: " + this.rsaKey.getKeyPair().getPublic());
 	}
@@ -77,7 +76,6 @@ public class AuthorizationService extends Thread implements Runnable {
 	private void receiveClientPubKey() throws IOException, ClassNotFoundException  { // Reception cle publique RSA
 		ObjectInputStream keyIn = new ObjectInputStream(this.clientSocket.getInputStream());
 		this.clientPubKey = (PublicKey)keyIn.readObject();
-		keyIn.close();
 
 		System.out.println("AS: Public key received from the client: " + clientPubKey);
 	}
@@ -155,7 +153,6 @@ public class AuthorizationService extends Thread implements Runnable {
 		outO.flush();
 		outO.writeObject(encryptedR2);
 		outO.flush();
-		outO.close();
 		
 		System.out.println("AS: ID sent to the blackboard: " + this.ID);
 		System.out.println("AS: WSID sent to the blackboard: " + this.ID);
@@ -188,7 +185,6 @@ public class AuthorizationService extends Thread implements Runnable {
 			System.out.println("AS: R3 received from the client: " + this.r3);
 			System.out.println("AS: Required WS: " + this.WSID);
 		}
-		in.close();
 	}
 	
 	private void sendIdAndNoncesToService() throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, IOException {
@@ -205,7 +201,6 @@ public class AuthorizationService extends Thread implements Runnable {
 		outO.flush();
 		outO.writeObject(encryptedR2);
 		outO.flush();
-		outO.close();
 		
 		System.out.println("AS: ID sent to the blackboard: " + this.ID);
 		System.out.println("AS: R1 sent to the blackboard: " + this.r1);
@@ -224,7 +219,6 @@ public class AuthorizationService extends Thread implements Runnable {
 		if(receivedR2 == this.r2) result = true;
 
 		System.out.println("AS: R2 received from the client: " + receivedR2);
-		in.close();
 		return result;
 	}
 	
@@ -250,7 +244,6 @@ public class AuthorizationService extends Thread implements Runnable {
 		ObjectOutputStream outO = new ObjectOutputStream(this.clientSocket.getOutputStream());
 		outO.writeObject(encryptedAESKey);
 		outO.flush();
-		outO.close();
 
 		System.out.println("AS: Web Service AES key sent." + this.AESKey);
 

@@ -44,9 +44,10 @@ public class AuthorizationServer {
 	private void acceptConnections(RsaKey rsaKey) {
 		while(true){			
 			try {
-				AuthorizationService AS = new AuthorizationService(this.myService.accept(), rsaKey, this);
-				AS.run();
-			}
+				//AuthorizationService AS = new AuthorizationService(this.myService.accept(), rsaKey, this);
+				//AS.run();
+				new AuthorizationService(this.myService.accept(), rsaKey, this).run();
+			
 			catch (IOException e) {
 				System.out.println(e);
 			}					    
