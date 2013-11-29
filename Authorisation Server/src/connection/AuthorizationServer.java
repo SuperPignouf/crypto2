@@ -47,6 +47,7 @@ public class AuthorizationServer {
 				//AuthorizationService AS = new AuthorizationService(this.myService.accept(), rsaKey, this);
 				//AS.run();
 				new AuthorizationService(this.myService.accept(), rsaKey, this).run();
+			}
 			
 			catch (IOException e) {
 				System.out.println(e);
