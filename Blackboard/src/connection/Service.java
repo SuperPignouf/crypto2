@@ -2,6 +2,7 @@ package connection;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -67,7 +68,15 @@ public class Service extends Thread implements Runnable {
 		
 	}
 	
-	private void runService(IDAES idaes){
+	private void runService(IDAES idaes) throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, IOException, IllegalBlockSizeException{
+		Cipher cipher = Cipher.getInstance("AES");
+		cipher.init(Cipher.ENCRYPT_MODE, idaes.getAES());
+		ObjectOutputStream outO = new ObjectOutputStream(this.clientSocket.getOutputStream());
+		
+		String msg = "Bonjour client, je suis un BlackBoard";
+		SealedObject encryptedMsg = new SealedObject (msg, cipher);
+		outO.writeObject(encryptedMsg);
+		outO.flush();
 		
 	}
 
