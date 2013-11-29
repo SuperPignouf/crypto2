@@ -40,6 +40,9 @@ public class ToAuthorisationServer {
 		sendPubKey();
 		receiveASPubKey();
 		needhamSchroeder();
+		receiveAESSessionKey();
+		// TODO Need to verify of the verifications associated the Needham-Schroeder protocol succeeded
+		// and that the Client can have access to the asked service.
 		closeConnection();
 	}
 
@@ -74,26 +77,7 @@ public class ToAuthorisationServer {
 		ASRecognized = receiveIdAndNonceFromAS();
 		if(ASRecognized) {
 			sendNonceBack();
-			receiveAESSessionKey();
 		}
-	}
-	
-	private void receiveAESSessionKey() throws IOException, ClassNotFoundException, InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException {
-		Cipher cipher = Cipher.getInstance("RSA");
-		cipher.init(Cipher.DECRYPT_MODE, this.rsaKey.getKeyPair().getPrivate());
-		ObjectInputStream in = new ObjectInputStream(this.toAS.getInputStream());
-		SealedObject encryptedSessionKey = (SealedObject)in.readObject();
-		SealedObject encryptedR1 = (SealedObject)in.readObject();
-		if ((Integer)encryptedR1.getObject(cipher) == this.r1){
-			byte[] SessionKey = new byte[32];
-			SessionKey = (byte[]) encryptedSessionKey.getObject(cipher);
-			this.ASAESKey = new SecretKeySpec(SessionKey, 0, 32, "AES");
-			this.SS.setASAES(this.ASAESKey);
-			System.out.println("BB : received AES key (AS-BB)" + this.ASAESKey);
-		}
-		else System.out.println("BB : error: bad r1, AES key refused");
-
-		
 	}
 
 	private void sendIdAndNonce() throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, IOException {
@@ -115,12 +99,12 @@ public class ToAuthorisationServer {
 		Cipher cipher = Cipher.getInstance("RSA");
 		cipher.init(Cipher.DECRYPT_MODE, this.rsaKey.getKeyPair().getPrivate());
 		ObjectInputStream in = new ObjectInputStream(this.toAS.getInputStream());
-		SealedObject ASEncryptedID = (SealedObject)in.readObject();
-		SealedObject EncryptedR1 = (SealedObject)in.readObject();
-		SealedObject EncryptedR2 = (SealedObject)in.readObject();
-		this.ASID = (Integer)ASEncryptedID.getObject(cipher);
-		int receivedR1 = (Integer)EncryptedR1.getObject(cipher);
-		this.r2 = (Integer)EncryptedR2.getObject(cipher);
+		SealedObject encryptedASID = (SealedObject) in.readObject();
+		SealedObject encryptedR1 = (SealedObject) in.readObject();
+		SealedObject encryptedR2 = (SealedObject) in.readObject();
+		this.ASID = (Integer) encryptedASID.getObject(cipher);
+		int receivedR1 = (Integer) encryptedR1.getObject(cipher);
+		this.r2 = (Integer) encryptedR2.getObject(cipher);
 
 		if(this.ASID == 0 && receivedR1 == this.r1)result = true; //System.out.println("Client: serveur d'authentification authentifie");
 
@@ -140,6 +124,23 @@ public class ToAuthorisationServer {
 		outO.flush();
 		
 		System.out.println("BLACKBOARD: R2 sent to the AS: " + this.r2);
+	}
+	
+	private void receiveAESSessionKey() throws IOException, ClassNotFoundException, InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException {
+		Cipher cipher = Cipher.getInstance("RSA");
+		cipher.init(Cipher.DECRYPT_MODE, this.rsaKey.getKeyPair().getPrivate());
+		ObjectInputStream in = new ObjectInputStream(this.toAS.getInputStream());
+		SealedObject encryptedSessionKey = (SealedObject) in.readObject();
+		SealedObject encryptedR1 = (SealedObject) in.readObject();
+		if ((Integer) encryptedR1.getObject(cipher) == this.r1){
+			byte[] SessionKey = new byte[32];
+			SessionKey = (byte[]) encryptedSessionKey.getObject(cipher);
+			this.ASAESKey = new SecretKeySpec(SessionKey, 0, 32, "AES");
+			this.SS.setASAES(this.ASAESKey);
+			System.out.println("BB : received AES key (AS-BB)" + this.ASAESKey);
+		}
+		else
+			System.out.println("BB : error: bad r1, AES key refused");
 	}
 
 	/**
