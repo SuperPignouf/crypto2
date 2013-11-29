@@ -29,8 +29,9 @@ public class ServiceServer {
 	private void acceptConnections() {
 		while(true){			
 			try {
-				Service BB = new Service(this.myService.accept());
-				BB.run();
+				//Service BB = new Service(this.myService.accept());
+				//BB.run();
+				new Service(this.myService.accept(), this.ASAESKey).run();
 			}
 			catch (IOException e) {
 				System.out.println(e);
@@ -52,6 +53,11 @@ public class ServiceServer {
 		for(IDAES i : this.IDAES){
 			if(i.equals(idaes)) this.IDAES.remove(i);
 		}
+	}
+
+	public void setASAES(SecretKey asaesKey) {
+		this.ASAESKey = asaesKey;
+		
 	}
 
 	

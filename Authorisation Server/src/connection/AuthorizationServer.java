@@ -83,7 +83,11 @@ public class AuthorizationServer {
 			cipher.init(Cipher.ENCRYPT_MODE, this.bbSessionKey);
 			SealedObject encryptedaesKey = new SealedObject(aesKey.getEncoded(), cipher);
 			ObjectOutputStream outO = new ObjectOutputStream(toWS.getOutputStream());
+			int myID = 0;
+			outO.writeObject(myID);
+			outO.flush();
 			outO.writeObject(encryptedaesKey);
+			outO.flush();
 			
 			outO.close();
 			toWS.close();
@@ -94,7 +98,11 @@ public class AuthorizationServer {
 			cipher.init(Cipher.ENCRYPT_MODE, this.kcSessionKey);
 			SealedObject encryptedaesKey = new SealedObject(aesKey.getEncoded(), cipher);
 			ObjectOutputStream outO = new ObjectOutputStream(toWS.getOutputStream());
+			int myID = 0;
+			outO.writeObject(myID);
+			outO.flush();
 			outO.writeObject(encryptedaesKey);
+			outO.flush();
 			
 			outO.close();
 			toWS.close();

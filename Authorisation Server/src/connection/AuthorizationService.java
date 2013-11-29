@@ -111,25 +111,48 @@ public class AuthorizationService extends Thread implements Runnable {
 			System.out.println("AS: Blackboard fully authentified.");
 			System.out.println("\nAES:");
 			System.out.println("AS: Distribution of the symmetric key...");
-			createAndSendAES();
+			createAndSendAEStoService();
 			this.AS.setBBSessionKey(this.AESKey); // On retient la cle AES pour pouvoir discuter avec le blackboard
 		}
 		else if(this.clientID == 2 && partnerRecognized){
 			System.out.println("AS: KeyChain fully authentified.");
 			System.out.println("\nAES:");
 			System.out.println("AS: Distribution of the symmetric key...");
-			createAndSendAES();
+			createAndSendAEStoService();
 			this.AS.setKCSessionKey(this.AESKey); // On retient la cle AES pour pouvoir discuter avec le blackboard
 		}
 		else if(this.clientID > 2 && partnerRecognized){
 			System.out.println("AS: User fully authentified.");
 			System.out.println("\nAES:");
 			System.out.println("AS: Distribution of the symmetric key...");
-			createAndSendAES();
+			createAndSendAEStoUser();
 			this.AS.transmitAESToWS(this.AESKey, this.WSID, this.clientID); // On transfere le clientID et la cle AES au Web service designe par WebServiceID
 		}
 	}
 	
+
+	private void createAndSendAEStoUser() throws NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, IOException, InvalidKeyException {
+		KeyGenerator keyGen = KeyGenerator.getInstance("AES");
+		keyGen.init(256);
+		this.AESKey = keyGen.generateKey();
+
+		Cipher cipher = Cipher.getInstance("RSA");
+		cipher.init(Cipher.ENCRYPT_MODE, this.clientPubKey);
+		
+		SealedObject encryptedAESKey = new SealedObject(this.AESKey.getEncoded(), cipher);
+		SealedObject encryptedR3 = new SealedObject(this.r3, cipher);
+		int t = 7200; // cryptoperiode = 2 heures
+		SealedObject encryptedT = new SealedObject(t, cipher);
+		
+		ObjectOutputStream outO = new ObjectOutputStream(this.clientSocket.getOutputStream());
+		outO.writeObject(encryptedAESKey);
+		outO.writeObject(encryptedT);
+		outO.writeObject(encryptedR3);
+		outO.flush();
+
+		System.out.println("AS: User AES key sent." + this.AESKey);
+		
+	}
 
 	private boolean legitimateUser() { // Acces a la bdd + demande eventuelle de mot de passe pour verifier l'identite de l'utilisateur
 		// Cette methode va aller voir dans la base de donnees si le user qui tente la connexion est bien enregistre.
@@ -231,7 +254,7 @@ public class AuthorizationService extends Thread implements Runnable {
 	 * @throws InvalidKeyException
 	 * @throws BadPaddingException
 	 */
-	private void createAndSendAES() throws NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, IOException, InvalidKeyException, BadPaddingException {
+	private void createAndSendAEStoService() throws NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, IOException, InvalidKeyException, BadPaddingException {
 		KeyGenerator keyGen = KeyGenerator.getInstance("AES");
 		keyGen.init(256);
 		this.AESKey = keyGen.generateKey();
@@ -240,9 +263,11 @@ public class AuthorizationService extends Thread implements Runnable {
 		cipher.init(Cipher.ENCRYPT_MODE, this.clientPubKey);
 		
 		SealedObject encryptedAESKey = new SealedObject(this.AESKey.getEncoded(), cipher);
+		SealedObject encryptedR1 = new SealedObject(this.r1, cipher);
 		
 		ObjectOutputStream outO = new ObjectOutputStream(this.clientSocket.getOutputStream());
 		outO.writeObject(encryptedAESKey);
+		outO.writeObject(encryptedR1);
 		outO.flush();
 
 		System.out.println("AS: Web Service AES key sent." + this.AESKey);
