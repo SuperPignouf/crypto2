@@ -2,7 +2,7 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 
-import connection.AuthorizationServer;
+import connection.AuthorisationServer;
 import crypto.RsaKey;
 
 /**
@@ -20,7 +20,7 @@ public class Main {
 		try {
 			try {
 				@SuppressWarnings("unused")
-				AuthorizationServer AS = new AuthorizationServer(new RsaKey());
+				AuthorisationServer AS = new AuthorisationServer(new RsaKey());
 			} catch (NoSuchAlgorithmException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

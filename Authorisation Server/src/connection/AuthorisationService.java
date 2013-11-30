@@ -23,9 +23,9 @@ import javax.crypto.SecretKey;
 
 import crypto.RsaKey;
 
-public class AuthorizationService extends Thread implements Runnable {
+public class AuthorisationService extends Thread implements Runnable {
 
-	private AuthorizationServer AS;
+	private AuthorisationServer AS;
 	private Socket clientSocket;
 	private RsaKey rsaKey;
 	private PublicKey clientPubKey;
@@ -33,7 +33,7 @@ public class AuthorizationService extends Thread implements Runnable {
 	private int r1, r2, r3; // TODO r2 = r4 OK ?
 	private SecretKey ASWSAESKey, WSClientAESKey;
 
-	public AuthorizationService(Socket clientSocket, RsaKey rsaKey, AuthorizationServer AS) {
+	public AuthorisationService(Socket clientSocket, RsaKey rsaKey, AuthorisationServer AS) {
 		this.AS = AS;
 		this.ID = 0;
 		this.clientSocket = clientSocket;
@@ -99,32 +99,31 @@ public class AuthorizationService extends Thread implements Runnable {
 		SecureRandom randomGenerator = new SecureRandom();
 		this.r2 = randomGenerator.nextInt(1000000);
 		receiveIdAndNonce();
-		if (this.clientID == 1 || this.clientID == 2){ // c'est un WS
+		if (this.clientID == 1 || this.clientID == 2){ // If WS.
 			sendIdAndNoncesToService();
 			partnerRecognized = receiveNonceBack();
 		}
-		else if (this.clientID > 2){ // C'est un user
+		else if (this.clientID > 2){ // If User.
 			sendIdAndNoncesToUser();
 			partnerRecognized = (receiveNonceBack() && legitimateUser());
 		}
 		
 		// TODO The following lines of code should be moved in another function keysDistribution for example.
-		// TODO What is the value of WSID when Client = WS ? Need to put WSID equals to -1 when Client = WS ?
-		if(this.WSID == 1 && partnerRecognized){
+		if(this.clientID == 1 && partnerRecognized){ // If the Client is the blackboard.
 			System.out.println("AS: Blackboard fully authentified.");
 			System.out.println("\nAES:");
 			System.out.println("AS: Distribution of the symmetric key AS-WS to the blackboard...");
 			createAndSendASWSAESKeytoService();
 			this.AS.setASWSAESKeyForBB(this.ASWSAESKey); // On retient la cle AES pour pouvoir discuter avec le blackboard
 		}
-		else if(this.WSID == 2 && partnerRecognized){
+		else if(this.clientID == 2 && partnerRecognized){ // If the Client is the keychain.
 			System.out.println("AS: KeyChain fully authentified.");
 			System.out.println("\nAES:");
 			System.out.println("AS: Distribution of the symmetric key AS-WS to the keychain...");
 			createAndSendASWSAESKeytoService();
 			this.AS.setASWSAESKeyForKC(this.ASWSAESKey); // On retient la cle AES pour pouvoir discuter avec le keychain
 		}
-		else if(this.clientID > 2 && partnerRecognized){
+		else if(this.clientID > 2 && partnerRecognized){ // If the Client is a user.
 			System.out.println("AS: User fully authentified.");
 			System.out.println("\nAES:");
 			System.out.println("AS: Distribution of the symmetric key...");
@@ -285,6 +284,7 @@ public class AuthorizationService extends Thread implements Runnable {
 		
 		ObjectOutputStream outO = new ObjectOutputStream(this.clientSocket.getOutputStream());
 		outO.writeObject(encryptedAESKey);
+		outO.flush();
 		outO.writeObject(encryptedR1);
 		outO.flush();
 

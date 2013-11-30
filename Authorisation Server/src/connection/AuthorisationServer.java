@@ -19,7 +19,7 @@ import crypto.RsaKey;
 /**
  * Class to create the Authorization server: it initializes the socket. 
  */
-public class AuthorizationServer {
+public class AuthorisationServer {
 
 	private SecretKey bbSessionKey;
 	private SecretKey kcSessionKey;
@@ -30,7 +30,7 @@ public class AuthorizationServer {
 	 * @param rsaKey the pair of keys (public and private) RSA.
 	 * @throws IOException
 	 */
-	public AuthorizationServer(RsaKey rsaKey) throws IOException{
+	public AuthorisationServer(RsaKey rsaKey) throws IOException{
 		initSocketConnection();
 		acceptConnections(rsaKey);
 	}
@@ -46,7 +46,7 @@ public class AuthorizationServer {
 			try {
 				//AuthorizationService AS = new AuthorizationService(this.myService.accept(), rsaKey, this);
 				//AS.run();
-				new AuthorizationService(this.myService.accept(), rsaKey, this).run();
+				new AuthorisationService(this.myService.accept(), rsaKey, this).run();
 			}
 			
 			catch (IOException e) {
