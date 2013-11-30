@@ -1,12 +1,8 @@
 package connection;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
 import java.net.Socket;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -23,7 +19,10 @@ import javax.crypto.spec.SecretKeySpec;
 
 import crypto.RsaKey;
 
-public class ToAuthorisationServer {
+/**
+ * Class for connecting to the Authorisation Server and receiving at the end the AS-WS AES session key.
+ */
+public class ToAuthorisationServerUsingRSA {
 
 	private Socket toAS;
 	private RsaKey rsaKey;
@@ -31,9 +30,20 @@ public class ToAuthorisationServer {
 	private int ID, ASID;
 	private int r1, r2;
 	private SecretKey ASWSAESKey;
-	private ServiceServer SS;
-
-	public 	ToAuthorisationServer(RsaKey rsaKey) throws IOException, ClassNotFoundException, InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException{
+	
+	/**
+	 * Constructor : initializes the ID and launches the whole protocol for the blackboard.
+	 * @param SS
+	 * @param rsaKey
+	 * @throws IOException
+	 * @throws ClassNotFoundException
+	 * @throws InvalidKeyException
+	 * @throws NoSuchAlgorithmException
+	 * @throws NoSuchPaddingException
+	 * @throws IllegalBlockSizeException
+	 * @throws BadPaddingException
+	 */
+	public 	ToAuthorisationServerUsingRSA(RsaKey rsaKey) throws IOException, ClassNotFoundException, InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException{
 		this.ID = 1;
 		this.rsaKey = rsaKey;
 		initConnection();
@@ -188,11 +198,10 @@ public class ToAuthorisationServer {
 			byte[] SessionKey = new byte[32];
 			SessionKey = (byte[]) encryptedSessionKey.getObject(cipher);
 			this.ASWSAESKey = new SecretKeySpec(SessionKey, 0, 32, "AES");
-			this.SS.setASAES(this.ASWSAESKey);
-			System.out.println("BB : received AES key (AS-BB)" + this.ASWSAESKey);
+			System.out.println("BB : received AS-WS AES session key (AS-BB)" + this.ASWSAESKey);
 		}
 		else
-			System.out.println("BB : error: bad r1, AES key refused");
+			System.out.println("BB : error: wrong r1, AS-WS AES session key refused");
 	}
 
 	/**
@@ -202,7 +211,11 @@ public class ToAuthorisationServer {
 	private void closeConnection() throws IOException {
 		this.toAS.close();
 	}
-
+	
+	/**
+	 * Returns the AS-WS AES session key (to the blackboard's "main" class, ServiceServer).
+	 * @return The AS-WS AES session key.
+	 */
 	public SecretKey getASWSAESKey() {
 		return this.ASWSAESKey;
 	}

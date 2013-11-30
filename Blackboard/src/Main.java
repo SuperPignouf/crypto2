@@ -6,14 +6,14 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
-import connection.ServiceServer;
-import connection.ToAuthorisationServer;
+import connection.BlackboardWebService;
+import connection.ToAuthorisationServerUsingRSA;
 import crypto.RsaKey;
 
 public class Main {
 	public static void main(String[] args) {
 		try {
-			/*ServiceServer SS = */new ServiceServer(new RsaKey());
+			BlackboardWebService blackboard = new BlackboardWebService(new RsaKey());
 		} catch (InvalidKeyException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

@@ -1,12 +1,8 @@
 package connection;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
 import java.net.Socket;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -23,17 +19,20 @@ import javax.crypto.SecretKey;
 
 import crypto.RsaKey;
 
-public class AuthorisationService extends Thread implements Runnable {
+/**
+ * Class for connecting to Clients (WS or user) using RSA encryption.
+ */
+public class RSASecuredService extends Thread implements Runnable {
 
 	private AuthorisationServer AS;
 	private Socket clientSocket;
 	private RsaKey rsaKey;
 	private PublicKey clientPubKey;
-	private int ID, clientID, WSID; // ID personnelle, ID du client, ID du web service demande par le client (dans le cas ou le client est un user)
+	private int ID, clientID, WSID; // AS"s ID, Client's ID and ID of the WS asked by the client (when the Client is a user)
 	private int r1, r2, r3; // TODO r2 = r4 OK ?
 	private SecretKey ASWSAESKey, WSClientAESKey;
-
-	public AuthorisationService(Socket clientSocket, RsaKey rsaKey, AuthorisationServer AS) {
+	
+	public RSASecuredService(Socket clientSocket, RsaKey rsaKey, AuthorisationServer AS) {
 		this.AS = AS;
 		this.ID = 0;
 		this.clientSocket = clientSocket;
@@ -128,7 +127,7 @@ public class AuthorisationService extends Thread implements Runnable {
 			System.out.println("\nAES:");
 			System.out.println("AS: Distribution of the symmetric key...");
 			createAndSendWSClientAESKeytoUser();
-			this.AS.transmitAESToWS(this.WSClientAESKey, this.WSID, this.clientID); // On transfere le clientID et la cle AES au Web service designe par WebServiceID
+			this.AS.transmitWSClientAESKeyToWS(this.WSClientAESKey, this.WSID, this.clientID); // On transfere le clientID et la cle AES au Web service designe par WebServiceID
 		}
 	}
 	
@@ -288,7 +287,7 @@ public class AuthorisationService extends Thread implements Runnable {
 		outO.writeObject(encryptedR1);
 		outO.flush();
 
-		System.out.println("AS: Web Service AES key sent." + this.ASWSAESKey);
+		System.out.println("AS: Web Service AES key sent: " + this.ASWSAESKey);
 
 	}
 	
