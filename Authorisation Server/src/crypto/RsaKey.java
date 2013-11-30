@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
@@ -25,8 +27,9 @@ import dataBase.DbLink;
  */
 public class RsaKey {
 
-	private Certificate cert;
-	private PrivateKey privKey;
+	//private Certificate cert;
+	//private PrivateKey privKey;
+	private KeyPair keyPair;
 
 	/**
 	 * Constructor: create a pair of keys (public and private) RSA.
@@ -54,18 +57,18 @@ public class RsaKey {
 		//		System.out.println(spec);
 		//		fis.close();
 
-		/*		KeyPairGenerator keyPairGenerator = null;
+				KeyPairGenerator keyPairGenerator = null;
 		try {
 			keyPairGenerator = KeyPairGenerator.getInstance("RSA"); //RSA
 		} catch (NoSuchAlgorithmException e) {
 			e.printStackTrace();
 		}
 		keyPairGenerator.initialize(1024); //1024 bits
-		this.keyPair = keyPairGenerator.genKeyPair();*/
+		this.keyPair = keyPairGenerator.genKeyPair();
 
 		// Loading private key file
 
-		String keyFile = "src/cakey.p8c";
+		/*String keyFile = "src/cakey.p8c";
 		InputStream inStream = new FileInputStream(keyFile);
 		byte[] encKey = new byte[inStream.available()];
 		inStream.read(encKey);
@@ -97,17 +100,25 @@ public class RsaKey {
 			System.out.println("You have the wrong key !");
 		} catch (Exception e) {
 			e.printStackTrace();
-		}
+		}*/
 
 
 	}
 
-	public PublicKey getPubKey(){
+	/*public PublicKey getPubKey(){
 		return this.cert.getPublicKey();
 	}
 
 	public PrivateKey getPrivKey() {
 		return this.privKey;
+	}*/
+	
+	/**
+	 * Returns the key public and private.
+	 * @return keyPair the pair of keys
+	 */
+	public KeyPair getKeyPair(){
+		return this.keyPair;
 	}
 
 }
