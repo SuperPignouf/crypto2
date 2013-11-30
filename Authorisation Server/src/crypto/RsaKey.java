@@ -3,28 +3,40 @@ package crypto;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.InvalidKeyException;
 import java.security.KeyFactory;
-import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.SignatureException;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
+
 
 /**
  * Class to create a pair of keys (public and private) RSA.
  */
 public class RsaKey {
 
-	private KeyPair keyPair;
+     private Certificate cert;
+     private PrivateKey privKey;
 
 	/**
 	 * Constructor: create a pair of keys (public and private) RSA.
 	 * @throws IOException 
 	 * @throws InvalidKeySpecException 
 	 * @throws NoSuchAlgorithmException 
+	 * @throws CertificateException 
+	 * @throws SignatureException 
+	 * @throws NoSuchProviderException 
+	 * @throws InvalidKeyException 
 	 */
-	public RsaKey() throws IOException, InvalidKeySpecException, NoSuchAlgorithmException{
+	public RsaKey() throws IOException, InvalidKeySpecException, NoSuchAlgorithmException, CertificateException, InvalidKeyException, NoSuchProviderException, SignatureException{
 
 		//		File file = new File("src\\chicken.der");
 		//		FileInputStream fis = new FileInputStream(file);
@@ -65,16 +77,36 @@ public class RsaKey {
         System.out.println("KeyFactory Object Info:");
         System.out.println("Algorithm = "+ keyFactory.getAlgorithm());
         System.out.println("Provider = "+ keyFactory.getProvider());
-        PrivateKey priv = (RSAPrivateKey) keyFactory.generatePrivate(privKeySpec);
-        System.out.println("Loaded " + priv.getAlgorithm() + " " + priv.getFormat() + " private key.");
+        this.privKey = (RSAPrivateKey) keyFactory.generatePrivate(privKeySpec);
+        System.out.println("Loaded " + this.privKey.getAlgorithm() + " " + this.privKey.getFormat() + " private key.");
+        
+        //Certificate MF !
+        
+        keyFile = "src/cacert.pem";
+        inStream = new FileInputStream(keyFile);
+        CertificateFactory cf = CertificateFactory.getInstance("X.509");
+        this.cert = cf.generateCertificate(inStream);
+        try {
+        	this.cert.verify(cert.getPublicKey());
+			System.out.println(cert);
+        } catch (SignatureException e) {
+			e.printStackTrace();
+			System.out.println("You have the wrong key !");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+        
+        
 	}
 
-	/**
-	 * Returns the key public and private.
-	 * @return keyPair the pair of keys
-	 */
-	public KeyPair getKeyPair(){
-		return this.keyPair;
+	public PublicKey getPubKey(){
+		return this.cert.getPublicKey();
+	}
+
+	public PrivateKey getPrivKey() {
+		return this.privKey;
 	}
 
 }
+
+
