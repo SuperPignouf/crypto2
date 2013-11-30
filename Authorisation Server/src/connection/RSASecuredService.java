@@ -67,10 +67,10 @@ public class RSASecuredService extends Thread implements Runnable {
 	private void sendPubKey() throws IOException {
 		System.out.println("PUBLIC KEYS");
 		ObjectOutputStream outO = new ObjectOutputStream(this.clientSocket.getOutputStream());
-		outO.writeObject(this.rsaKey.getKeyPair().getPublic());
+		outO.writeObject(this.rsaKey.getPubKey());
 		outO.flush();
 		
-		System.out.println("AS: Public key sent to the client: " + this.rsaKey.getKeyPair().getPublic());
+		System.out.println("AS: Public key sent to the client: " + this.rsaKey.getPubKey());
 	}
 	
 	// TODO It's the admin who must generate the keys.
@@ -143,7 +143,7 @@ public class RSASecuredService extends Thread implements Runnable {
 	 */
 	private void receiveIdAndNonce() throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, IOException, ClassNotFoundException {
 		Cipher cipher = Cipher.getInstance("RSA");
-		cipher.init(Cipher.DECRYPT_MODE, this.rsaKey.getKeyPair().getPrivate());
+		cipher.init(Cipher.DECRYPT_MODE, this.rsaKey.getPrivKey());
 
 		ObjectInputStream in = new ObjectInputStream(this.clientSocket.getInputStream());
 
@@ -243,7 +243,7 @@ public class RSASecuredService extends Thread implements Runnable {
 	private boolean receiveNonceBack() throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, IOException, ClassNotFoundException {
 		boolean result = false;
 		Cipher cipher = Cipher.getInstance("RSA");
-		cipher.init(Cipher.DECRYPT_MODE, this.rsaKey.getKeyPair().getPrivate());
+		cipher.init(Cipher.DECRYPT_MODE, this.rsaKey.getPrivKey());
 
 		ObjectInputStream in = new ObjectInputStream(this.clientSocket.getInputStream());
 
