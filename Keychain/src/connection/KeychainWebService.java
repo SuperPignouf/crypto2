@@ -26,7 +26,7 @@ public class KeychainWebService {
 	private List<IDAES> IDAESList; // List of keys allowing to communicate with Clients and ID's of corresponding Clients.
 
 	public KeychainWebService(RsaKey rsaKey) throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, IOException, ClassNotFoundException {
-		KeychainToAuthorisationServerUsingRSA TAS = new KeychainToAuthorisationServerUsingRSA(this.ID, rsaKey);
+		KeychainToAuthorisationServerUsingRSA TAS = new KeychainToAuthorisationServerUsingRSA(this, this.ID, rsaKey);
 		this.ASKeychainAESKey = TAS.getASKeychainAESKey(); // Get the AS-Keychain AES session key from the AS.
 		initSocketConnection();
 		acceptConnections(); // On est pret a recevoir des requetes
@@ -40,7 +40,7 @@ public class KeychainWebService {
 			try {
 				//Service BB = new Service(this.myService.accept());
 				//BB.run();
-				new AESSecuredService(this.myService.accept(), this.ASKeychainAESKey, this).run();
+				new KeychainAESSecuredService(this.myService.accept(), this.ASKeychainAESKey, this).run();
 			}
 			catch (IOException e) {
 				System.out.println(e);

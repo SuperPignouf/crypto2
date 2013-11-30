@@ -30,11 +30,13 @@ public class RSASecuredService extends Thread implements Runnable {
 	private PublicKey clientPubKey;
 	private int ID, clientID, WSID; // AS"s ID, Client's ID and ID of the WS asked by the client (when the Client is a user)
 	private int r1, r2, r3; // TODO r2 = r4 OK ?
+	private int cryptoperiod;
 	private SecretKey ASWSAESKey, WSClientAESKey;
 	
-	public RSASecuredService(Socket clientSocket, RsaKey rsaKey, AuthorisationServer AS) {
+	public RSASecuredService(AuthorisationServer AS, Socket clientSocket, RsaKey rsaKey, int ID, int cryptoperiod) {
 		this.AS = AS;
-		this.ID = 0;
+		this.ID = ID;
+		this.cryptoperiod = cryptoperiod;
 		this.clientSocket = clientSocket;
 		this.rsaKey = rsaKey;
 	}
@@ -114,21 +116,21 @@ public class RSASecuredService extends Thread implements Runnable {
 			System.out.println("AS: Blackboard fully authentified.");
 			System.out.println("\nAES:");
 			System.out.println("AS: Distribution of the symmetric key AS-WS to the blackboard...");
-			createAndSendASWSAESKeytoService();
+			createAndSendASWSAESKeyToService();
 			this.AS.setASBlackboardAESKey(this.ASWSAESKey); // The AS-WS AES Key is memorized by the AS.
 		}
 		else if(this.clientID == 2 && partnerRecognized){ // If the Client is the Keychain.
 			System.out.println("AS: KeyChain fully authentified.");
 			System.out.println("\nAES:");
 			System.out.println("AS: Distribution of the symmetric key AS-WS to the keychain...");
-			createAndSendASWSAESKeytoService();
+			createAndSendASWSAESKeyToService();
 			this.AS.setASKeychainAESKey(this.ASWSAESKey); // The AS-WS AES Key is memorized by the AS.
 		}
 		else if(this.clientID > 2 && partnerRecognized){ // If the Client is a user.
 			System.out.println("AS: User fully authentified.");
 			System.out.println("\nAES:");
 			System.out.println("AS: Distribution of the symmetric key...");
-			createAndSendWSClientAESKeytoUser();
+			createAndSendWSClientAESKeyToUser();
 			this.AS.transmitWSClientAESKeyToWS(this.WSClientAESKey, this.WSID, this.clientID);
 		}
 	}
@@ -160,14 +162,14 @@ public class RSASecuredService extends Thread implements Runnable {
 		}
 		else if(this.clientID > 2){ // When the Client is a user.
 			this.WSID = (Integer) in.readObject();
-			SealedObject encryptedR3 = (SealedObject) in.readObject();
 			SealedObject encryptedClientID = (SealedObject) in.readObject();
 			SealedObject encryptedWSID = (SealedObject) in.readObject();
+			SealedObject encryptedR3 = (SealedObject) in.readObject();
 			this.r3 = (Integer) encryptedR3.getObject(cipher);
 			
 			System.out.println("AS: ID received from the client (user): " + this.clientID);
-			System.out.println("AS: R3 received from the client (user): " + this.r3);
 			System.out.println("AS: Required WS: " + this.WSID);
+			System.out.println("AS: R3 received from the client (user): " + this.r3);
 		}
 	}
 	
@@ -225,10 +227,10 @@ public class RSASecuredService extends Thread implements Runnable {
 		outO.writeObject(encryptedR2);
 		outO.flush();
 		
-		System.out.println("AS: ID sent to the blackboard: " + this.ID);
-		System.out.println("AS: WSID sent to the blackboard: " + this.WSID);
-		System.out.println("AS: R3 sent to the blackboard: " + this.r3);
-		System.out.println("AS: R4 sent to the blackboard: " + this.r2);
+		System.out.println("AS: ID sent to the client: " + this.ID);
+		System.out.println("AS: WSID sent to the client: " + this.WSID);
+		System.out.println("AS: R3 sent to the client: " + this.r3);
+		System.out.println("AS: R4 sent to the client: " + this.r2);
 		
 	}
 	
@@ -274,7 +276,7 @@ public class RSASecuredService extends Thread implements Runnable {
 	 * @throws InvalidKeyException
 	 * @throws BadPaddingException
 	 */
-	private void createAndSendASWSAESKeytoService() throws NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, IOException, InvalidKeyException, BadPaddingException {
+	private void createAndSendASWSAESKeyToService() throws NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, IOException, InvalidKeyException, BadPaddingException {
 		KeyGenerator keyGen = KeyGenerator.getInstance("AES");
 		keyGen.init(256);
 		this.ASWSAESKey = keyGen.generateKey();
@@ -303,7 +305,7 @@ public class RSASecuredService extends Thread implements Runnable {
 	 * @throws IOException
 	 * @throws InvalidKeyException
 	 */
-	private void createAndSendWSClientAESKeytoUser() throws NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, IOException, InvalidKeyException {
+	private void createAndSendWSClientAESKeyToUser() throws NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, IOException, InvalidKeyException {
 		KeyGenerator keyGen = KeyGenerator.getInstance("AES");
 		keyGen.init(256);
 		this.WSClientAESKey = keyGen.generateKey();
@@ -313,12 +315,13 @@ public class RSASecuredService extends Thread implements Runnable {
 		
 		SealedObject encryptedWSClientAESKey = new SealedObject(this.WSClientAESKey.getEncoded(), cipher);
 		SealedObject encryptedR3 = new SealedObject(this.r3, cipher);
-		int cryptoperiod = 7200; // cryptoperiode = 2 heures
-		SealedObject encryptedCryptoperiod = new SealedObject(cryptoperiod, cipher);
+		SealedObject encryptedCryptoperiod = new SealedObject(this.cryptoperiod, cipher);
 		
 		ObjectOutputStream outO = new ObjectOutputStream(this.clientSocket.getOutputStream());
 		outO.writeObject(encryptedWSClientAESKey);
+		outO.flush();
 		outO.writeObject(encryptedCryptoperiod);
+		outO.flush();
 		outO.writeObject(encryptedR3);
 		outO.flush();
 

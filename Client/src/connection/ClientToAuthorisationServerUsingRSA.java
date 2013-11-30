@@ -21,7 +21,7 @@ import javax.crypto.spec.SecretKeySpec;
 
 import crypto.RsaKey;
 
-public class ClientToASCommunicationUsingRSA {
+public class ClientToAuthorisationServerUsingRSA {
 
 	private int ID, ASID, WSID, r3, r4, cryptoperiod;
 	private RsaKey rsaKey;
@@ -29,10 +29,10 @@ public class ClientToASCommunicationUsingRSA {
 	private SecretKey WSClientAESKey;
 	private Socket toAS, toWS1, toWS2;
 	
-	public ClientToASCommunicationUsingRSA(int WSID, RsaKey rsaKey) throws IOException, ClassNotFoundException, InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException{
+	public ClientToAuthorisationServerUsingRSA(int WSID, RsaKey rsaKey) throws IOException, ClassNotFoundException, InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException{
 		// TODO Need to modify the creation of the ID.
-		Random randGenerator = new Random(999997);
-		this.ID = randGenerator.nextInt() + 3;
+		Random randGenerator = new Random();
+		this.ID = randGenerator.nextInt(999997) + 3;
 		this.WSID = WSID;
 		this.rsaKey = rsaKey;
 		
@@ -109,7 +109,7 @@ public class ClientToASCommunicationUsingRSA {
 		cipher.init(Cipher.ENCRYPT_MODE, this.ASPubKey);
 		SealedObject encryptedID = new SealedObject(this.ID, cipher);
 		SealedObject encryptedWSID = new SealedObject(this.WSID, cipher);
-		SealedObject encryptedR1 = new SealedObject(this.r3, cipher);
+		SealedObject encryptedR3 = new SealedObject(this.r3, cipher);
 		ObjectOutputStream outO = new ObjectOutputStream(this.toAS.getOutputStream());
 		outO.writeObject(this.ID);
 		outO.flush();
@@ -119,7 +119,7 @@ public class ClientToASCommunicationUsingRSA {
 		outO.flush();
 		outO.writeObject(encryptedWSID);
 		outO.flush();
-		outO.writeObject(encryptedR1);
+		outO.writeObject(encryptedR3);
 		outO.flush();
 		
 		System.out.println("CLIENT: ID sent to the AS: " + this.ID);
@@ -151,11 +151,11 @@ public class ClientToASCommunicationUsingRSA {
 		int receivedR3 = (Integer) encryptedR3.getObject(cipher);
 		this.r4 = (Integer) encryptedR4.getObject(cipher);
 
-		if(this.ASID == 0 && receivedWSID == this.WSID && receivedR3 == this.r4)
+		if(this.ASID == 0 && receivedWSID == this.WSID && receivedR3 == this.r3)
 			result = true;
 
 		System.out.println("CLIENT: AS's ID received from the AS: " + this.ASID);
-		System.out.println("CLIENT: WS's ID received from the AS: " + receivedR3);
+		System.out.println("CLIENT: WS's ID received from the AS: " + receivedWSID);
 		System.out.println("CLIENT: R3 received from the AS: " + receivedR3);
 		System.out.println("CLIENT: R4 received from the AS: " + this.r4);
 		return result;

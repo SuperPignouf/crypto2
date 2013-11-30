@@ -26,7 +26,7 @@ public class BlackboardWebService {
 	private List<IDAES> IDAESList; // List of keys allowing to communicate with Clients and ID's of corresponding Clients.
 
 	public BlackboardWebService(RsaKey rsaKey) throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, IOException, ClassNotFoundException {
-		BlackboardToAuthorisationServerUsingRSA TAS = new BlackboardToAuthorisationServerUsingRSA(this.ID, rsaKey);
+		BlackboardToAuthorisationServerUsingRSA TAS = new BlackboardToAuthorisationServerUsingRSA(this, this.ID, rsaKey);
 		this.ASBlackboardAESKey = TAS.getASBlackboardAESKey(); // Get the AS-Blackboard AES session key from the AS.
 		initSocketConnection();
 		acceptConnections(); // On est pret a recevoir des requetes
@@ -40,7 +40,7 @@ public class BlackboardWebService {
 			try {
 				//Service BB = new Service(this.myService.accept());
 				//BB.run();
-				new AESSecuredService(this.myService.accept(), this.ASBlackboardAESKey, this).run();
+				new BlackboardAESSecuredService(this.myService.accept(), this.ASBlackboardAESKey, this).run();
 			}
 			catch (IOException e) {
 				System.out.println(e);
