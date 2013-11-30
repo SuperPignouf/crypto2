@@ -60,23 +60,23 @@ public class AuthorisationServer {
 	}
 	
 	/**
-	 * Sets the AS-WS AES session key for the blackboard.
-	 * @param AESSessionKey
+	 * Sets the AS-Blackboard AES session key.
+	 * @param AESKey
 	 */
-	public void setASWSAESKeyForBB(SecretKey AESKey) {
+	public void setASBlackboardAESKey(SecretKey AESKey) {
 		this.ASBlackboardAESKey = AESKey;
 	}
 	
 	/**
-	 * Sets the AS-WS AES session key for the keychain.
-	 * @param AESSessionKey
+	 * Sets the AS-Keychain AES session key.
+	 * @param AESKey
 	 */
-	public void setASWSAESKeyForKC(SecretKey AESKey) {
+	public void setASKeychainAESKey(SecretKey AESKey) {
 		this.ASKeychainAESKey = AESKey;
 	}
 
 	/**
-	 * Transmits the WS-Client AES "cryptoperiodic" session key to the WS.
+	 * Transmits the WS-Client AES "cryptoperiodic" session key to the appropriate WS.
 	 * @param WSClientAESKey
 	 * @param WSID
 	 * @param clientID
@@ -89,7 +89,7 @@ public class AuthorisationServer {
 	 */
 	public void transmitWSClientAESKeyToWS(SecretKey WSClientAESKey, int WSID, int clientID) throws UnknownHostException, IOException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException { 
 		Socket toWS;
-		if (WSID == 1){ // If blackboard.
+		if (WSID == 1){ // If Blackboard.
 			toWS = new Socket("localhost", 4224);
 			Cipher cipher = Cipher.getInstance("AES");
 			cipher.init(Cipher.ENCRYPT_MODE, this.ASBlackboardAESKey);
@@ -104,7 +104,7 @@ public class AuthorisationServer {
 			outO.close();
 			toWS.close();
 		}
-		else if (WSID == 2){ // If keychain.
+		else if (WSID == 2){ // If Keychain.
 			toWS = new Socket("localhost", 4242);
 			Cipher cipher = Cipher.getInstance("AES");
 			cipher.init(Cipher.ENCRYPT_MODE, this.ASKeychainAESKey);

@@ -108,26 +108,26 @@ public class RSASecuredService extends Thread implements Runnable {
 		}
 		
 		// TODO The following lines of code should be moved in another function keysDistribution for example.
-		if(this.clientID == 1 && partnerRecognized){ // If the Client is the blackboard.
+		if(this.clientID == 1 && partnerRecognized){ // If the Client is the Blackboard.
 			System.out.println("AS: Blackboard fully authentified.");
 			System.out.println("\nAES:");
 			System.out.println("AS: Distribution of the symmetric key AS-WS to the blackboard...");
 			createAndSendASWSAESKeytoService();
-			this.AS.setASWSAESKeyForBB(this.ASWSAESKey); // On retient la cle AES pour pouvoir discuter avec le blackboard
+			this.AS.setASBlackboardAESKey(this.ASWSAESKey); // The AS-WS AES Key is memorized by the AS.
 		}
-		else if(this.clientID == 2 && partnerRecognized){ // If the Client is the keychain.
+		else if(this.clientID == 2 && partnerRecognized){ // If the Client is the Keychain.
 			System.out.println("AS: KeyChain fully authentified.");
 			System.out.println("\nAES:");
 			System.out.println("AS: Distribution of the symmetric key AS-WS to the keychain...");
 			createAndSendASWSAESKeytoService();
-			this.AS.setASWSAESKeyForKC(this.ASWSAESKey); // On retient la cle AES pour pouvoir discuter avec le keychain
+			this.AS.setASKeychainAESKey(this.ASWSAESKey); // The AS-WS AES Key is memorized by the AS.
 		}
 		else if(this.clientID > 2 && partnerRecognized){ // If the Client is a user.
 			System.out.println("AS: User fully authentified.");
 			System.out.println("\nAES:");
 			System.out.println("AS: Distribution of the symmetric key...");
 			createAndSendWSClientAESKeytoUser();
-			this.AS.transmitWSClientAESKeyToWS(this.WSClientAESKey, this.WSID, this.clientID); // On transfere le clientID et la cle AES au Web service designe par WebServiceID
+			this.AS.transmitWSClientAESKeyToWS(this.WSClientAESKey, this.WSID, this.clientID);
 		}
 	}
 	
