@@ -23,10 +23,11 @@ public class Main {
 	 */
 	public static void main(String[] args){
 		
-		//DbLink dbLink = new DbLink();
+		DbLink dbLink = new DbLink();
 		
 		try {
 			@SuppressWarnings("unused")
+			//AuthorisationServer AS = new AuthorisationServer(new RsaKey(dbLink));
 			AuthorisationServer AS = new AuthorisationServer(new RsaKey());
 		} catch (NoSuchAlgorithmException e) {
 			// TODO Auto-generated catch block
@@ -52,5 +53,6 @@ public class Main {
 			e.printStackTrace();
 		}
 	}
+
 
 }
