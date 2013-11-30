@@ -20,20 +20,20 @@ import javax.crypto.spec.SecretKeySpec;
 import crypto.RsaKey;
 
 /**
- * Class for connecting to the Authorisation Server and receiving at the end the AS-WS AES session key.
+ * Class for connecting to the Authorisation Server and receiving at the end the AS-Blackboard AES session key.
  */
-public class ToAuthorisationServerUsingRSA {
+public class BlackboardToAuthorisationServerUsingRSA {
 
 	private Socket toAS;
 	private RsaKey rsaKey;
 	private PublicKey ASPubKey;
 	private int ID, ASID;
 	private int r1, r2;
-	private SecretKey ASWSAESKey;
+	private SecretKey ASBlackboardAESKey;
 	
 	/**
 	 * Constructor : initializes the ID and launches the whole protocol for the blackboard.
-	 * @param SS
+	 * @param ID
 	 * @param rsaKey
 	 * @throws IOException
 	 * @throws ClassNotFoundException
@@ -43,8 +43,8 @@ public class ToAuthorisationServerUsingRSA {
 	 * @throws IllegalBlockSizeException
 	 * @throws BadPaddingException
 	 */
-	public 	ToAuthorisationServerUsingRSA(RsaKey rsaKey) throws IOException, ClassNotFoundException, InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException{
-		this.ID = 1;
+	public 	BlackboardToAuthorisationServerUsingRSA(int ID, RsaKey rsaKey) throws IOException, ClassNotFoundException, InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException{
+		this.ID = ID;
 		this.rsaKey = rsaKey;
 		initConnection();
 		sendPubKey();
@@ -67,7 +67,7 @@ public class ToAuthorisationServerUsingRSA {
 		outO.writeObject(this.rsaKey.getKeyPair().getPublic());
 		outO.flush();
 		
-		System.out.println("BLACKBOARD: Public key sent to the authorization server: " + this.rsaKey.getKeyPair().getPublic());
+		System.out.println("BLACKBOARD: Public key sent to the authorisation server: " + this.rsaKey.getKeyPair().getPublic());
 	}
 	
 	// TODO It's the admin who must generate the keys.
@@ -80,7 +80,7 @@ public class ToAuthorisationServerUsingRSA {
 	}
 	
 	/**
-	 * Launches a Needham-Schroeder protocol between the WS and the AS. 
+	 * Launches a Needham-Schroeder protocol between the Blackboard and the AS. 
 	 * @throws InvalidKeyException
 	 * @throws NoSuchAlgorithmException
 	 * @throws NoSuchPaddingException
@@ -103,7 +103,7 @@ public class ToAuthorisationServerUsingRSA {
 	}
 	
 	/**
-	 * First part of the Needham-Schroeder protocol for the WS, sends the WS's ID as well as the nonce to the AS.
+	 * First part of the Needham-Schroeder protocol for the Blackboard, sends the Blackboard's ID as well as the nonce to the AS.
 	 * @throws NoSuchAlgorithmException
 	 * @throws NoSuchPaddingException
 	 * @throws InvalidKeyException
@@ -128,7 +128,7 @@ public class ToAuthorisationServerUsingRSA {
 	}
 	
 	/**
-	 * Second part of the Needham-Schroeder protocol for the WS, receives the AS's ID as well as the nonces from the AS.
+	 * Second part of the Needham-Schroeder protocol for the Blackboard, receives the AS's ID as well as the nonces from the AS.
 	 * @throws ClassNotFoundException 
 	 * @throws IOException 
 	 * @throws BadPaddingException 
@@ -159,7 +159,7 @@ public class ToAuthorisationServerUsingRSA {
 	}
 	
 	/**
-	 * Third and last part of the Needham-Schroeder protocol for the WS, sends back the second nouce to the AS.
+	 * Third and last part of the Needham-Schroeder protocol for the Blackboard, sends back the second nouce to the AS.
 	 * @throws NoSuchAlgorithmException
 	 * @throws NoSuchPaddingException
 	 * @throws InvalidKeyException
@@ -179,7 +179,7 @@ public class ToAuthorisationServerUsingRSA {
 	}
 	
 	/**
-	 * Receives from the AS the AS-WS AES session key that will be used by the WS to decrypt the Client-WS "cryptoperiodic" AES session key later sent by the AS.
+	 * Receives from the AS the AS-Blackboard AES session key that will be used by the Blackboard to decrypt the Client-Blackboard "cryptoperiodic" AES session key later sent by the AS.
 	 * @throws IOException
 	 * @throws ClassNotFoundException
 	 * @throws InvalidKeyException
@@ -197,11 +197,11 @@ public class ToAuthorisationServerUsingRSA {
 		if ((Integer) encryptedR1.getObject(cipher) == this.r1){
 			byte[] SessionKey = new byte[32];
 			SessionKey = (byte[]) encryptedSessionKey.getObject(cipher);
-			this.ASWSAESKey = new SecretKeySpec(SessionKey, 0, 32, "AES");
-			System.out.println("BB : received AS-WS AES session key (AS-BB)" + this.ASWSAESKey);
+			this.ASBlackboardAESKey = new SecretKeySpec(SessionKey, 0, 32, "AES");
+			System.out.println("BLACHBOARD : received AS-Blackboard AES session key " + this.ASBlackboardAESKey);
 		}
 		else
-			System.out.println("BB : error: wrong r1, AS-WS AES session key refused");
+			System.out.println("BLACKBOARD : error: wrong r1, AS-Blackboard AES session key refused");
 	}
 
 	/**
@@ -213,11 +213,11 @@ public class ToAuthorisationServerUsingRSA {
 	}
 	
 	/**
-	 * Returns the AS-WS AES session key (to the blackboard's "main" class, ServiceServer).
-	 * @return The AS-WS AES session key.
+	 * Returns the AS-Blackboard AES session key (to the Blackboard's "main" class, ServiceServer).
+	 * @return The AS-Blackboard AES session key.
 	 */
-	public SecretKey getASWSAESKey() {
-		return this.ASWSAESKey;
+	public SecretKey getASBlackboardAESKey() {
+		return this.ASBlackboardAESKey;
 	}
 
 }
