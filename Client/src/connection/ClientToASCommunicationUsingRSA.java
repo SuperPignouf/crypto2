@@ -21,7 +21,7 @@ import javax.crypto.spec.SecretKeySpec;
 
 import crypto.RsaKey;
 
-public class ToAuthorisationServerUsingRSA {
+public class ClientToASCommunicationUsingRSA {
 
 	private int ID, ASID, WSID, r3, r4, cryptoperiod;
 	private RsaKey rsaKey;
@@ -29,7 +29,7 @@ public class ToAuthorisationServerUsingRSA {
 	private SecretKey WSClientAESKey;
 	private Socket toAS, toWS1, toWS2;
 	
-	public ToAuthorisationServerUsingRSA(int WSID, RsaKey rsaKey) throws IOException, ClassNotFoundException, InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException{
+	public ClientToASCommunicationUsingRSA(int WSID, RsaKey rsaKey) throws IOException, ClassNotFoundException, InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException{
 		// TODO Need to modify the creation of the ID.
 		Random randGenerator = new Random(999997);
 		this.ID = randGenerator.nextInt() + 3;
@@ -43,7 +43,7 @@ public class ToAuthorisationServerUsingRSA {
 		// TODO Need to verify of the verifications associated the Needham-Schroeder protocol succeeded
 		// and that the Client can have access to the asked service.
 		this.receiveWSClientAESKey();
-		//closeConnection();
+		closeConnection();
 	}
 	
 	/**
@@ -52,22 +52,6 @@ public class ToAuthorisationServerUsingRSA {
 	 */
 	private void initConnectionWithAS() throws IOException{
 		this.toAS = new Socket("localhost", 2442);
-	}
-	
-	/**
-	 * Opens a connection to the first Web Service (virtual blackboard, port 4224).
-	 * @throws IOException
-	 */
-	private void initConnectionWithWS1() throws IOException{
-		this.toWS1 = new Socket("localhost", 4224);
-	}
-	
-	/**
-	 * Opens a connection to the second Web Service (virtual keychain server, port 4224).
-	 * @throws IOException
-	 */
-	private void initConnectionWithWS2() throws IOException{
-		this.toWS2 = new Socket("localhost", 4242);
 	}
 	
 	// TODO It's the admin who must generate the keys.
@@ -222,6 +206,22 @@ public class ToAuthorisationServerUsingRSA {
 		}
 		else
 			System.out.println("CLIENT: error: bad r2, AES key refused");
+	}
+	
+	/**
+	 * Closes the connection.
+	 * @throws IOException
+	 */
+	private void closeConnection() throws IOException {
+		this.toAS.close();
+	}
+	
+	/**
+	 * Returns the AS-WS AES session key (to the blackboard's "main" class, ServiceServer).
+	 * @return The AS-WS AES session key.
+	 */
+	public SecretKey getWSClientAESKey() {
+		return this.WSClientAESKey;
 	}
 
 }

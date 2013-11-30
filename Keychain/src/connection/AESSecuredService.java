@@ -22,9 +22,9 @@ public class AESSecuredService extends Thread implements Runnable {
 	private int ID, clientID; // Id personnelle, ID du client
 	private Socket clientSocket;
 	private SecretKey ASAES; // La cle de session AES permettant de communiquer avec l'AS
-	private BlackboardWebService serviceServer;
+	private KeychainWebService serviceServer;
 
-	public AESSecuredService(Socket accept, SecretKey ASAESKey, BlackboardWebService serviceServer) {
+	public AESSecuredService(Socket accept, SecretKey ASAESKey, KeychainWebService serviceServer) {
 		this.ID = 1;
 		this.clientSocket = accept;
 		this.ASAES = ASAESKey;
@@ -39,11 +39,11 @@ public class AESSecuredService extends Thread implements Runnable {
 		try {
 			this.clientID = identifyClient();
 			if (this.clientID == 0){ // AS
-				System.out.println("BLACKBOARD : AS identified");
+				System.out.println("KEYCHAIN : AS identified");
 				receiveUserIDAndSessionKey();
 			}
 			else if (this.clientID > 2){
-				System.out.println("BLACKBOARD : user identified");
+				System.out.println("KEYCHAIN : user identified");
 				runService(this.serviceServer.getIDAES(this.clientID));
 			}
 		} catch (IOException e) {
@@ -76,7 +76,7 @@ public class AESSecuredService extends Thread implements Runnable {
 		cipher.init(Cipher.ENCRYPT_MODE, idaes.getAES());
 		ObjectOutputStream outO = new ObjectOutputStream(this.clientSocket.getOutputStream());
 		
-		String msg = "Bonjour client, je suis un Blackboard";
+		String msg = "Bonjour client, je suis un Keychain";
 		SealedObject encryptedMsg = new SealedObject (msg, cipher);
 		outO.writeObject(encryptedMsg);
 		outO.flush();
@@ -94,9 +94,9 @@ public class AESSecuredService extends Thread implements Runnable {
 		AESKey = (byte[]) encryptedAESKey.getObject(cipher);
 		this.serviceServer.addIDAES((Integer) encryptedUserID.getObject(cipher), (Integer) encryptedCryptoperiod.getObject(cipher), new SecretKeySpec(AESKey, 0, 32, "AES")); // L'id de l'user et la cle associee sont stockees dans l'objet serviceServer
 		
-		System.out.println("BLACKBOARD : received client ID : " + (Integer) encryptedUserID.getObject(cipher));
-		System.out.println("BLACKBOARD : received related session AES key : " + new SecretKeySpec(AESKey, 0, 32, "AES"));
-		System.out.println("BLACKBOARD : received cryptoperiod of that key : " + (Integer) encryptedCryptoperiod.getObject(cipher) + "sec");
+		System.out.println("KEYCHAIN : received client ID : " + (Integer) encryptedUserID.getObject(cipher));
+		System.out.println("KEYCHAIN : received related session AES key : " + new SecretKeySpec(AESKey, 0, 32, "AES"));
+		System.out.println("KEYCHAIN : received cryptoperiod of that key : " + (Integer) encryptedCryptoperiod.getObject(cipher) + "sec");
 	}
 
 	private int identifyClient() throws IOException, ClassNotFoundException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException {

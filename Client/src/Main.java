@@ -1,28 +1,18 @@
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.util.Scanner;
-
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
-import connection.ToAuthorisationServerUsingRSA;
+import connection.Client;
 import crypto.RsaKey;
 
 
 public class Main {
 	public static void main(String[] args){
-		String response;
-		do {
-			System.out.println("Hello, which service would you access to ? (blackboard: 1 , keychain: 2 )");
-			Scanner sc = new Scanner(System.in);
-			response = sc.next();
-		}
-		while (!"1".equals(response) && !"2".equals(response));
-			
 		try {
-			/*ToAuthorisationServer TAS = */new ToAuthorisationServerUsingRSA(Integer.parseInt(response), new RsaKey());
+			/*Client client = */new Client(new RsaKey());
 		} catch (InvalidKeyException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

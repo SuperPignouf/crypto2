@@ -15,19 +15,19 @@ import dataContainers.IDAES;
 import crypto.RsaKey;
 
 /**
- * The "main" class of the blackboard. It starts by connecting to the Authorisation Server to receive a session key (AS-BlackBoard AES key), and then
+ * The "main" class of the blackboard. It starts by connecting to the Authorisation Server to receive a session key (AS-BB AES key), and then
  * accepts connections in a symmetric encryption style.
  */
-public class BlackboardWebService {
+public class KeychainWebService {
 	
-	private int ID = 1;
-	private SecretKey ASBlackboardAESKey; // The AS-Blackboard AES session key.
+	private int ID = 2;
+	private SecretKey ASKeychainAESKey; // The AS-Keychain AES session key.
 	private ServerSocket myService;
 	private List<IDAES> IDAESList; // List of keys allowing to communicate with Clients and ID's of corresponding Clients.
 
-	public BlackboardWebService(RsaKey rsaKey) throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, IOException, ClassNotFoundException {
-		BlackboardToAuthorisationServerUsingRSA TAS = new BlackboardToAuthorisationServerUsingRSA(this.ID, rsaKey);
-		this.ASBlackboardAESKey = TAS.getASBlackboardAESKey(); // Get the AS-Blackboard AES session key from the AS.
+	public KeychainWebService(RsaKey rsaKey) throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, IOException, ClassNotFoundException {
+		KeychainToAuthorisationServerUsingRSA TAS = new KeychainToAuthorisationServerUsingRSA(this.ID, rsaKey);
+		this.ASKeychainAESKey = TAS.getASKeychainAESKey(); // Get the AS-Keychain AES session key from the AS.
 		initSocketConnection();
 		acceptConnections(); // On est pret a recevoir des requetes
 	}
@@ -40,7 +40,7 @@ public class BlackboardWebService {
 			try {
 				//Service BB = new Service(this.myService.accept());
 				//BB.run();
-				new AESSecuredService(this.myService.accept(), this.ASBlackboardAESKey, this).run();
+				new AESSecuredService(this.myService.accept(), this.ASKeychainAESKey, this).run();
 			}
 			catch (IOException e) {
 				System.out.println(e);
@@ -68,8 +68,8 @@ public class BlackboardWebService {
 		}
 	}
 
-	public void setASBlackboardAES(SecretKey ASBlackboardAESKey) {
-		this.ASBlackboardAESKey = ASBlackboardAESKey;
+	public void setASKeychainAES(SecretKey ASKeychainAESKey) {
+		this.ASKeychainAESKey = ASKeychainAESKey;
 	}
 	
 	public IDAES getIDAES(int id){
@@ -81,3 +81,4 @@ public class BlackboardWebService {
 	}
 
 }
+
