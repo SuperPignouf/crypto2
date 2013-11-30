@@ -17,22 +17,25 @@ import javax.crypto.spec.SecretKeySpec;
 
 import dataContainers.IDAES;
 
-public class Service extends Thread implements Runnable {
+public class AESSecuredService extends Thread implements Runnable {
 
 	private int ID, clientID; // Id personnelle, ID du client
 	private Socket clientSocket;
 	private SecretKey ASAES; // La cle de session AES permettant de communiquer avec l'AS
-	private ServiceServer serviceServer;
+	private BlackboardWebService serviceServer;
 
-	public Service(Socket accept, SecretKey aSAESKey, ServiceServer serviceServer) {
+	public AESSecuredService(Socket accept, SecretKey ASAESKey, BlackboardWebService serviceServer) {
 		this.ID = 1;
 		this.clientSocket = accept;
-		this.ASAES = aSAESKey;
+		this.ASAES = ASAESKey;
 		this.serviceServer = serviceServer;
 	}
-
+	
+	/**
+	 * //Recoit les messages de l'AS et traite les requetes des users
+	 */
 	@Override
-	public void run() { //Recoit les messages de l'AS et traite les requetes des users
+	public void run() {
 		try {
 			this.clientID = identifyClient();
 			if (this.clientID == 0){ // AS

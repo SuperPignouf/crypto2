@@ -17,17 +17,16 @@ import javax.crypto.SecretKey;
 import crypto.RsaKey;
 
 /**
- * Class to create the Authorization server: it initializes the socket. 
+ * The "main" class of the AS. It creates the Authorisation Server, connects with clients using RSA encryption and finally transmits 
  */
 public class AuthorisationServer {
 
-	private SecretKey bbSessionKey;
-	private SecretKey kcSessionKey;
+	private SecretKey ASBlackboardAESKey, ASKeychainAESKey;
 	private ServerSocket myService;
 
 	/**
-	 * Constructor: create the Authorization Server.
-	 * @param rsaKey the pair of keys (public and private) RSA.
+	 * Constructor: creates the Authorization Server.
+	 * @param rsaKey - The pair of keys (public and private) RSA.
 	 * @throws IOException
 	 */
 	public AuthorisationServer(RsaKey rsaKey) throws IOException{
@@ -36,20 +35,16 @@ public class AuthorisationServer {
 	}
 
 	/**
-	 * Server: accepts connection with clients. 
+	 * Accepts connections with Clients. 
 	 * Runs the thread that identifies the client (with RSA).
-	 * If the client has been identified, it distributes securely a symmetric key (AES).
+	 * If the Client has been identified, it distributes securely a symmetric key (AES).
 	 * @param rsaKey
 	 */
 	private void acceptConnections(RsaKey rsaKey) {
 		while(true){			
 			try {
-				//AuthorizationService AS = new AuthorizationService(this.myService.accept(), rsaKey, this);
-				//AS.run();
-				new AuthorisationService(this.myService.accept(), rsaKey, this).run();
-			}
-			
-			catch (IOException e) {
+				new RSASecuredService(this.myService.accept(), rsaKey, this).run();
+			} catch (IOException e) {
 				System.out.println(e);
 			}					    
 		}
@@ -57,51 +52,68 @@ public class AuthorisationServer {
 
 
 	/**
-	 * Initializes the socket.
-	 * Port = 2442.
+	 * Initializes the socket (port 2442).
 	 * @throws IOException
 	 */
 	private void initSocketConnection() throws IOException {
 		this.myService = new ServerSocket(2442);
 	}
-
-	public void setASWSAESKeyForBB(SecretKey aesServiceKey) {
-		this.bbSessionKey = aesServiceKey;	
+	
+	/**
+	 * Sets the AS-WS AES session key for the blackboard.
+	 * @param AESSessionKey
+	 */
+	public void setASWSAESKeyForBB(SecretKey AESKey) {
+		this.ASBlackboardAESKey = AESKey;
 	}
 	
-	public void setASWSAESKeyForKC(SecretKey aesServiceKey) {
-		this.kcSessionKey = aesServiceKey;	
+	/**
+	 * Sets the AS-WS AES session key for the keychain.
+	 * @param AESSessionKey
+	 */
+	public void setASWSAESKeyForKC(SecretKey AESKey) {
+		this.ASKeychainAESKey = AESKey;
 	}
 
-	// On va se connecter au Web service designe par wsid et 
-	//lui envoyer la cle aes et la clientID pour que client et WS puissent parler
-	public void transmitAESToWS(SecretKey aesKey, int wsid, int clientID) throws UnknownHostException, IOException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException { 
+	/**
+	 * Transmits the WS-Client AES "cryptoperiodic" session key to the WS.
+	 * @param WSClientAESKey
+	 * @param WSID
+	 * @param clientID
+	 * @throws UnknownHostException
+	 * @throws IOException
+	 * @throws NoSuchAlgorithmException
+	 * @throws NoSuchPaddingException
+	 * @throws InvalidKeyException
+	 * @throws IllegalBlockSizeException
+	 */
+	public void transmitWSClientAESKeyToWS(SecretKey WSClientAESKey, int WSID, int clientID) throws UnknownHostException, IOException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException { 
 		Socket toWS;
-		if (wsid == 1){ // Cas du blackboard
+		if (WSID == 1){ // If blackboard.
 			toWS = new Socket("localhost", 4224);
 			Cipher cipher = Cipher.getInstance("AES");
-			cipher.init(Cipher.ENCRYPT_MODE, this.bbSessionKey);
-			SealedObject encryptedaesKey = new SealedObject(aesKey.getEncoded(), cipher);
+			cipher.init(Cipher.ENCRYPT_MODE, this.ASBlackboardAESKey);
+			SealedObject encryptedBBClientAESKey = new SealedObject(WSClientAESKey.getEncoded(), cipher);
 			ObjectOutputStream outO = new ObjectOutputStream(toWS.getOutputStream());
 			int myID = 0;
 			outO.writeObject(myID);
 			outO.flush();
-			outO.writeObject(encryptedaesKey);
+			outO.writeObject(encryptedBBClientAESKey);
 			outO.flush();
 			
 			outO.close();
 			toWS.close();
 		}
-		else if (wsid == 2){ // Cas du keychain
+		else if (WSID == 2){ // If keychain.
 			toWS = new Socket("localhost", 4242);
 			Cipher cipher = Cipher.getInstance("AES");
-			cipher.init(Cipher.ENCRYPT_MODE, this.kcSessionKey);
-			SealedObject encryptedaesKey = new SealedObject(aesKey.getEncoded(), cipher);
+			cipher.init(Cipher.ENCRYPT_MODE, this.ASKeychainAESKey);
+			SealedObject encryptedKCClientKey = new SealedObject(WSClientAESKey.getEncoded(), cipher);
 			ObjectOutputStream outO = new ObjectOutputStream(toWS.getOutputStream());
 			int myID = 0;
 			outO.writeObject(myID);
 			outO.flush();
-			outO.writeObject(encryptedaesKey);
+			outO.writeObject(encryptedKCClientKey);
 			outO.flush();
 			
 			outO.close();

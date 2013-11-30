@@ -6,7 +6,7 @@ import connection.AuthorisationServer;
 import crypto.RsaKey;
 
 /**
- * Main class: Create the authorization server.
+ * Main class: Creates the Authorisation Server.
  */
 public class Main {
 	

@@ -21,7 +21,7 @@ import javax.crypto.spec.SecretKeySpec;
 
 import crypto.RsaKey;
 
-public class ToAuthorisationServer {
+public class ToAuthorisationServerUsingRSA {
 
 	private int ID, ASID, WSID, r3, r4, cryptoperiod;
 	private RsaKey rsaKey;
@@ -29,7 +29,7 @@ public class ToAuthorisationServer {
 	private SecretKey WSClientAESKey;
 	private Socket toAS, toWS1, toWS2;
 	
-	public ToAuthorisationServer(int WSID, RsaKey rsaKey) throws IOException, ClassNotFoundException, InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException{
+	public ToAuthorisationServerUsingRSA(int WSID, RsaKey rsaKey) throws IOException, ClassNotFoundException, InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException{
 		// TODO Need to modify the creation of the ID.
 		Random randGenerator = new Random(999997);
 		this.ID = randGenerator.nextInt() + 3;
