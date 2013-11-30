@@ -65,11 +65,11 @@ public class AuthorizationServer {
 		this.myService = new ServerSocket(2442);
 	}
 
-	public void setBBSessionKey(SecretKey aesServiceKey) {
+	public void setASWSAESKeyForBB(SecretKey aesServiceKey) {
 		this.bbSessionKey = aesServiceKey;	
 	}
 	
-	public void setKCSessionKey(SecretKey aesServiceKey) {
+	public void setASWSAESKeyForKC(SecretKey aesServiceKey) {
 		this.kcSessionKey = aesServiceKey;	
 	}
 

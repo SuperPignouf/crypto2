@@ -30,7 +30,7 @@ public class ToAuthorisationServer {
 	private PublicKey ASPubKey;
 	private int ID, ASID;
 	private int r1, r2;
-	private SecretKey ASAESKey;
+	private SecretKey ASWSAESKey;
 	private ServiceServer SS;
 
 	public 	ToAuthorisationServer(RsaKey rsaKey) throws IOException, ClassNotFoundException, InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException{
@@ -40,8 +40,8 @@ public class ToAuthorisationServer {
 		sendPubKey();
 		receiveASPubKey();
 		needhamSchroeder();
-		receiveAESSessionKey();
-		// TODO Need to verify of the verifications associated the Needham-Schroeder protocol succeeded
+		receiveASWSAESKey();
+		// TODO Need to see if the verifications associated the Needham-Schroeder protocol succeeded
 		// and that the Client can have access to the asked service.
 		closeConnection();
 	}
@@ -50,6 +50,7 @@ public class ToAuthorisationServer {
 		toAS = new Socket("localhost", 2442);
 	}
 	
+	// TODO It's the admin who must generate the keys.
 	private void sendPubKey() throws IOException {
 		System.out.println("PUBLIC KEYS");
 		ObjectOutputStream outO = new ObjectOutputStream(this.toAS.getOutputStream());
@@ -59,6 +60,7 @@ public class ToAuthorisationServer {
 		System.out.println("BLACKBOARD: Public key sent to the authorization server: " + this.rsaKey.getKeyPair().getPublic());
 	}
 	
+	// TODO It's the admin who must generate the keys.
 	private void receiveASPubKey() throws IOException, ClassNotFoundException {
 
 		ObjectInputStream keyIn = new ObjectInputStream(this.toAS.getInputStream());
@@ -67,6 +69,16 @@ public class ToAuthorisationServer {
 		System.out.println("BLACKBOARD: Public key received from the server: " + this.ASPubKey);
 	}
 	
+	/**
+	 * Launches a Needham-Schroeder protocol between the WS and the AS. 
+	 * @throws InvalidKeyException
+	 * @throws NoSuchAlgorithmException
+	 * @throws NoSuchPaddingException
+	 * @throws IllegalBlockSizeException
+	 * @throws IOException
+	 * @throws BadPaddingException
+	 * @throws ClassNotFoundException
+	 */
 	private void needhamSchroeder() throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, IOException, BadPaddingException, ClassNotFoundException {
 		System.out.println("\n\nNEEDHAM-SCHROEDER PROTOCOL:");
 		System.out.println("RSA:");
@@ -79,13 +91,24 @@ public class ToAuthorisationServer {
 			sendNonceBack();
 		}
 	}
-
+	
+	/**
+	 * First part of the Needham-Schroeder protocol for the WS, sends the WS's ID as well as the nonce to the AS.
+	 * @throws NoSuchAlgorithmException
+	 * @throws NoSuchPaddingException
+	 * @throws InvalidKeyException
+	 * @throws IllegalBlockSizeException
+	 * @throws IOException
+	 */
 	private void sendIdAndNonce() throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, IOException {
 		Cipher cipher = Cipher.getInstance("RSA");
 		cipher.init(Cipher.ENCRYPT_MODE, this.ASPubKey);
+		SealedObject encryptedID = new SealedObject(this.ID, cipher);
 		SealedObject encryptedR1 = new SealedObject(this.r1, cipher);
 		ObjectOutputStream outO = new ObjectOutputStream(this.toAS.getOutputStream());
 		outO.writeObject(this.ID);
+		outO.flush();
+		outO.writeObject(encryptedID);
 		outO.flush();
 		outO.writeObject(encryptedR1);
 		outO.flush();
@@ -94,6 +117,16 @@ public class ToAuthorisationServer {
 		System.out.println("BLACKBOARD: R1 sent to the AS: " + this.r1);
 	}
 	
+	/**
+	 * Second part of the Needham-Schroeder protocol for the WS, receives the AS's ID as well as the nonces from the AS.
+	 * @throws ClassNotFoundException 
+	 * @throws IOException 
+	 * @throws BadPaddingException 
+	 * @throws IllegalBlockSizeException 
+	 * @throws InvalidKeyException 
+	 * @throws NoSuchPaddingException 
+	 * @throws NoSuchAlgorithmException 
+	 */
 	private boolean receiveIdAndNonceFromAS() throws IllegalBlockSizeException, BadPaddingException, InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, IOException, ClassNotFoundException {
 		boolean result = false;
 		Cipher cipher = Cipher.getInstance("RSA");
@@ -106,14 +139,23 @@ public class ToAuthorisationServer {
 		int receivedR1 = (Integer) encryptedR1.getObject(cipher);
 		this.r2 = (Integer) encryptedR2.getObject(cipher);
 
-		if(this.ASID == 0 && receivedR1 == this.r1)result = true; //System.out.println("Client: serveur d'authentification authentifie");
+		if(this.ASID == 0 && receivedR1 == this.r1)
+			result = true; //System.out.println("Client: serveur d'authentification authentifie");
 
 		System.out.println("BLACKBOARD: ID received from the AS: " + this.ASID);
 		System.out.println("BLACKBOARD: R1 received from the AS: " + receivedR1);
 		System.out.println("BLACKBOARD: R2 received from the AS: " + this.r2);
 		return result;
 	}
-
+	
+	/**
+	 * Third and last part of the Needham-Schroeder protocol for the WS, sends back the second nouce to the AS.
+	 * @throws NoSuchAlgorithmException
+	 * @throws NoSuchPaddingException
+	 * @throws InvalidKeyException
+	 * @throws IllegalBlockSizeException
+	 * @throws IOException
+	 */
 	private void sendNonceBack() throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, IOException {
 		Cipher cipher = Cipher.getInstance("RSA");
 		cipher.init(Cipher.ENCRYPT_MODE, this.ASPubKey);
@@ -126,7 +168,17 @@ public class ToAuthorisationServer {
 		System.out.println("BLACKBOARD: R2 sent to the AS: " + this.r2);
 	}
 	
-	private void receiveAESSessionKey() throws IOException, ClassNotFoundException, InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException {
+	/**
+	 * Receives from the AS the AS-WS AES session key that will be used by the WS to decrypt the Client-WS "cryptoperiodic" AES session key later sent by the AS.
+	 * @throws IOException
+	 * @throws ClassNotFoundException
+	 * @throws InvalidKeyException
+	 * @throws NoSuchAlgorithmException
+	 * @throws NoSuchPaddingException
+	 * @throws IllegalBlockSizeException
+	 * @throws BadPaddingException
+	 */
+	private void receiveASWSAESKey() throws IOException, ClassNotFoundException, InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException {
 		Cipher cipher = Cipher.getInstance("RSA");
 		cipher.init(Cipher.DECRYPT_MODE, this.rsaKey.getKeyPair().getPrivate());
 		ObjectInputStream in = new ObjectInputStream(this.toAS.getInputStream());
@@ -135,9 +187,9 @@ public class ToAuthorisationServer {
 		if ((Integer) encryptedR1.getObject(cipher) == this.r1){
 			byte[] SessionKey = new byte[32];
 			SessionKey = (byte[]) encryptedSessionKey.getObject(cipher);
-			this.ASAESKey = new SecretKeySpec(SessionKey, 0, 32, "AES");
-			this.SS.setASAES(this.ASAESKey);
-			System.out.println("BB : received AES key (AS-BB)" + this.ASAESKey);
+			this.ASWSAESKey = new SecretKeySpec(SessionKey, 0, 32, "AES");
+			this.SS.setASAES(this.ASWSAESKey);
+			System.out.println("BB : received AES key (AS-BB)" + this.ASWSAESKey);
 		}
 		else
 			System.out.println("BB : error: bad r1, AES key refused");
@@ -151,8 +203,8 @@ public class ToAuthorisationServer {
 		this.toAS.close();
 	}
 
-	public SecretKey getASAESKey() {
-		return this.ASAESKey;
+	public SecretKey getASWSAESKey() {
+		return this.ASWSAESKey;
 	}
 
 }

@@ -28,7 +28,6 @@ public class ToAuthorisationServer {
 	private PublicKey ASPubKey;
 	private SecretKey WSClientAESKey;
 	private Socket toAS, toWS1, toWS2;
-	//private ServiceServer SS;
 	
 	public ToAuthorisationServer(int WSID, RsaKey rsaKey) throws IOException, ClassNotFoundException, InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException{
 		// TODO Need to modify the creation of the ID.
@@ -43,7 +42,7 @@ public class ToAuthorisationServer {
 		this.needhamSchroederWithAS();
 		// TODO Need to verify of the verifications associated the Needham-Schroeder protocol succeeded
 		// and that the Client can have access to the asked service.
-		this.receiveAESSessionKey();
+		this.receiveWSClientAESKey();
 		//closeConnection();
 	}
 	
@@ -71,7 +70,7 @@ public class ToAuthorisationServer {
 		this.toWS2 = new Socket("localhost", 4242);
 	}
 	
-	// TODO It's the admin who must generate the keys, not the Client.
+	// TODO It's the admin who must generate the keys.
 	private void sendPubKey() throws IOException {
 		System.out.println("PUBLIC KEYS");
 		ObjectOutputStream outO = new ObjectOutputStream(this.toAS.getOutputStream());
@@ -81,6 +80,7 @@ public class ToAuthorisationServer {
 		System.out.println("CLIENT: Public key sent to the authorization server: " + this.rsaKey.getKeyPair().getPublic());
 	}
 	
+	// TODO It's the admin who must generate the keys.
 	private void receiveASPubKey() throws IOException, ClassNotFoundException {
 
 		ObjectInputStream keyIn = new ObjectInputStream(this.toAS.getInputStream());
@@ -113,7 +113,7 @@ public class ToAuthorisationServer {
 	}
 	
 	/**
-	 * First part of the Needham-Schroeder protocol, sends the Client and the WS's IDs as well as the nonce to the AS.
+	 * First part of the Needham-Schroeder protocol for the Client, sends the Client and the WS's IDs as well as the nonce to the AS.
 	 * @throws NoSuchAlgorithmException
 	 * @throws NoSuchPaddingException
 	 * @throws InvalidKeyException
@@ -123,17 +123,17 @@ public class ToAuthorisationServer {
 	private void sendIDsAndNonce() throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, IOException {
 		Cipher cipher = Cipher.getInstance("RSA");
 		cipher.init(Cipher.ENCRYPT_MODE, this.ASPubKey);
-		SealedObject encryptedClientID = new SealedObject(this.ID, cipher);
-		SealedObject encryptedServiceID = new SealedObject(this.WSID, cipher);
+		SealedObject encryptedID = new SealedObject(this.ID, cipher);
+		SealedObject encryptedWSID = new SealedObject(this.WSID, cipher);
 		SealedObject encryptedR1 = new SealedObject(this.r3, cipher);
 		ObjectOutputStream outO = new ObjectOutputStream(this.toAS.getOutputStream());
 		outO.writeObject(this.ID);
 		outO.flush();
 		outO.writeObject(this.WSID);
 		outO.flush();
-		outO.writeObject(encryptedClientID);
+		outO.writeObject(encryptedID);
 		outO.flush();
-		outO.writeObject(encryptedServiceID);
+		outO.writeObject(encryptedWSID);
 		outO.flush();
 		outO.writeObject(encryptedR1);
 		outO.flush();
@@ -144,7 +144,7 @@ public class ToAuthorisationServer {
 	}
 	
 	/**
-	 * Second part of the Needham-Schroeder protocol, receives the AS and the WS's IDs as well as the nonces from the AS.
+	 * Second part of the Needham-Schroeder protocol for the Client, receives the AS and the WS's IDs as well as the nonces from the AS.
 	 * @throws ClassNotFoundException 
 	 * @throws IOException 
 	 * @throws BadPaddingException 
@@ -178,7 +178,7 @@ public class ToAuthorisationServer {
 	}
 	
 	/**
-	 * The third and last part of the Needham-Schroeder protocol, sends back the second nouce to the AS.
+	 * Third and last part of the Needham-Schroeder protocol for the Client, sends back the second nouce to the AS.
 	 * @throws NoSuchAlgorithmException
 	 * @throws NoSuchPaddingException
 	 * @throws InvalidKeyException
@@ -196,7 +196,17 @@ public class ToAuthorisationServer {
 		System.out.println("CLIENT: R4 sent to the AS: " + this.r4);
 	}
 	
-	private void receiveAESSessionKey() throws IOException, ClassNotFoundException, InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException {
+	/**
+	 * Receives from the AS the WS-Client AES session key used by the client to send encrypted requests to the asked WS.
+	 * @throws IOException
+	 * @throws ClassNotFoundException
+	 * @throws InvalidKeyException
+	 * @throws NoSuchAlgorithmException
+	 * @throws NoSuchPaddingException
+	 * @throws IllegalBlockSizeException
+	 * @throws BadPaddingException
+	 */
+	private void receiveWSClientAESKey() throws IOException, ClassNotFoundException, InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException {
 		Cipher cipher = Cipher.getInstance("RSA");
 		cipher.init(Cipher.DECRYPT_MODE, this.rsaKey.getKeyPair().getPrivate());
 		ObjectInputStream in = new ObjectInputStream(this.toAS.getInputStream());
@@ -208,7 +218,6 @@ public class ToAuthorisationServer {
 			byte[] SessionKey = new byte[32];
 			SessionKey = (byte[]) encryptedSessionKey.getObject(cipher);
 			this.WSClientAESKey = new SecretKeySpec(SessionKey, 0, 32, "AES"); // AES key shared between the WS and the Client.
-			//this.SS.setAES(this.AESKey);
 			System.out.println("CLIENT: received AES key (Client-WS)" + this.WSClientAESKey);
 		}
 		else

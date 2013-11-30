@@ -22,7 +22,7 @@ public class ServiceServer {
 
 	public ServiceServer(RsaKey rsaKey) throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, IOException, ClassNotFoundException {
 		ToAuthorisationServer TAS = new ToAuthorisationServer(rsaKey); // Authentification avec l'AS
-		this.ASAESKey = TAS.getASAESKey(); // Reception de la cle de session AES permettant de communiquer avec l'AS
+		this.ASAESKey = TAS.getASWSAESKey(); // Reception de la cle de session AES permettant de communiquer avec l'AS
 		initSocketConnection(); // Initialisation du socket serveur
 		acceptConnections(); // On est pret a recevoir des requetes
 	}
