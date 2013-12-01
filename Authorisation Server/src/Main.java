@@ -10,7 +10,7 @@ import connection.AuthorisationServer;
 import crypto.RsaKey;
 
 /**
- * Main class: Creates the Authorisation Server.
+ * Main class: Creates the Authorization Server.
  */
 public class Main {
 
@@ -25,9 +25,8 @@ public class Main {
 		//DbLink dbLink = new DbLink();
 		
 		try {
-			@SuppressWarnings("unused")
 			//AuthorisationServer AS = new AuthorisationServer(new RsaKey(dbLink));
-			AuthorisationServer AS = new AuthorisationServer(new RsaKey());
+			new AuthorisationServer(new RsaKey());
 		} catch (NoSuchAlgorithmException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
