@@ -94,7 +94,7 @@ public class RsaKey {
 		
 		//loading AS cert
 		
-		this.myCert = dbLink.getCertificateByUserID(1);
+		this.myCert = dbLink.getCertificateByUserID(0);
 		try {
 			this.myCert.verify(this.adminCert.getPublicKey()); // On verifie que notre certificat a bien ete signe avec la cle publique presente sur le certificat de l'admin
 			System.out.println(myCert);

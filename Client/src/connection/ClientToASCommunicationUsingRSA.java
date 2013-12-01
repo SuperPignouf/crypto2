@@ -1,6 +1,7 @@
 package connection;
 
 import java.io.DataInputStream;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -10,6 +11,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.util.Random;
+import java.util.Scanner;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -30,9 +32,10 @@ public class ClientToASCommunicationUsingRSA {
 	private Socket toAS, toWS1, toWS2;
 	
 	public ClientToASCommunicationUsingRSA(int WSID, RsaKey rsaKey) throws IOException, ClassNotFoundException, InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException{
-		// TODO Need to modify the creation of the ID.
-		Random randGenerator = new Random(999997);
-		this.ID = randGenerator.nextInt() + 3;
+		String keyFile = "src/ID.txt";
+		FileInputStream inStream = new FileInputStream(keyFile);
+		Scanner sc = new Scanner(inStream);
+		this.ID = sc.nextInt();
 		this.WSID = WSID;
 		this.rsaKey = rsaKey;
 		
