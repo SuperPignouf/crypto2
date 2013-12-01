@@ -6,6 +6,10 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -78,6 +82,19 @@ public class KeychainAESSecuredService extends Thread implements Runnable {
 		outO.writeObject(encryptedMsg);
 		outO.flush();
 		
+		Class.forName("com.mysql.jdbc.Driver");
+		Connection con=null;
+		try {
+			String OS = System.getProperty("os.name").toLowerCase();
+			if(OS.contains("mac")) {
+				con = DriverManager.getConnection("jdbc:mysql://localhost:8889/crypto2","root", "root");
+			} else { //linux or windows
+			con = DriverManager.getConnection("jdbc:mysql://localhost/crypto2","root", "");
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
 		System.out.println("\n"+"------- KEYCHAIN -------");
 		while(!msg.equals(" ")) { //TODO add cryptotime
 			cipher.init(Cipher.DECRYPT_MODE, idaes.getAES());
@@ -85,6 +102,14 @@ public class KeychainAESSecuredService extends Thread implements Runnable {
 			SealedObject ClientMsg = (SealedObject) in.readObject();
 			msg = (String) ClientMsg.getObject(cipher);
 			System.out.println(msg);
+			Statement stm=null;
+			try {
+				stm = con.createStatement();
+				stm.execute("INSERT...");
+			    stm=null;
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
 		}
 		System.out.println("END");
 		
