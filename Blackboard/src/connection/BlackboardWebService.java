@@ -42,7 +42,7 @@ public class BlackboardWebService {
 		while(true){			
 			try {
 				this.clientSocket = this.myService.accept();
-				System.out.println("BLACKBOARD: Someone wants to connect.");
+				System.out.println("\nBLACKBOARD: Someone wants to connect.");
 				t = new Thread(new BlackboardAESSecuredService(this, this.clientSocket, this.ASBlackboardAESKey));
 				t.start();
 			}

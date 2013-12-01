@@ -37,7 +37,7 @@ public class BlackboardAESSecuredService extends Thread implements Runnable {
 	@Override
 	public void run() {
 		try {
-			this.clientID = identifyClient();
+			identifyClient();
 			if (this.clientID == 0){ // AS
 				System.out.println("BLACKBOARD : AS identified");
 				receiveUserIDAndBlackboardUserKey();
@@ -101,9 +101,9 @@ public class BlackboardAESSecuredService extends Thread implements Runnable {
 		System.out.println("BLACKBOARD : received cryptoperiod of that key : " + (Integer) encryptedCryptoperiod.getObject(cipher) + "sec");
 	}
 
-	private int identifyClient() throws IOException, ClassNotFoundException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException {
+	private void identifyClient() throws IOException, ClassNotFoundException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException {
 		ObjectInputStream in = new ObjectInputStream(this.clientSocket.getInputStream());
-		return (Integer) in.readObject();
+		this.clientID = (Integer) in.readObject();
 	}
 
 }

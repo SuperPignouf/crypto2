@@ -28,11 +28,11 @@ public class Client {
 		ClientToAuthorisationServerUsingRSA TAS = new ClientToAuthorisationServerUsingRSA(this.WSID, rsaKey);
 		this.WSClientAESKey = TAS.getWSClientAESKey(); // Get the WS-Client AES session key from the AS.
 		
-		if (this.WSID == 1)
+		/*if (this.WSID == 1)
 			initConnectionWithBlackboard();
 		else if (this.WSID == 2)
 			initConnectionWithKeychain();
-		sendRequestToWS();
+		sendRequestToWS();*/
 	}
 	
 	/**

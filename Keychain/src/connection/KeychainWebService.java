@@ -42,7 +42,7 @@ public class KeychainWebService {
 		while(true){			
 			try {
 				this.clientSocket = this.myService.accept();
-				System.out.println("KEYCHAIN: Someone wants to connect.");
+				System.out.println("\nKEYCHAIN: Someone wants to connect.");
 				t = new Thread(new KeychainAESSecuredService(this, this.clientSocket, this.ASKeychainAESKey));
 				t.start();
 			}

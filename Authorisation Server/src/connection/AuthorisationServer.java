@@ -48,7 +48,7 @@ public class AuthorisationServer {
 		while(true){			
 			try {
 				this.clientSocket = this.myService.accept();
-				System.out.println("AS: Someone wants to connect.");
+				System.out.println("\nAS: Someone wants to connect.");
 				t = new Thread(new RSASecuredService(this, this.clientSocket, rsaKey, this.ID, this.cryptoperiod));
 				t.start();
 			} catch (IOException e) {
