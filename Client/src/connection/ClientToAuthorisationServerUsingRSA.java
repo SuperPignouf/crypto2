@@ -1,7 +1,5 @@
 package connection;
 
-import java.io.DataInputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -11,8 +9,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.cert.Certificate;
-import java.util.Random;
-import java.util.Scanner;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -26,6 +22,7 @@ import crypto.RsaKey;
 
 public class ClientToAuthorisationServerUsingRSA {
 
+	@SuppressWarnings("unused")
 	private int ID, ASID, WSID, r3, r4, cryptoperiod;
 	private RsaKey rsaKey;
 	private PublicKey ASPubKey;

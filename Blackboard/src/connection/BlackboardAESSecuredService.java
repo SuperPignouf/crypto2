@@ -19,7 +19,7 @@ import dataContainers.IDAES;
 
 public class BlackboardAESSecuredService extends Thread implements Runnable {
 
-	private int ID, clientID; // personal ID, any client's ID (AS ou user).
+	private int clientID; // personal ID, any client's ID (AS ou user).
 	private Socket clientSocket;
 	private SecretKey ASKey; // La cle de session AES permettant de communiquer avec l'AS
 	private BlackboardWebService blackboard;
@@ -27,7 +27,6 @@ public class BlackboardAESSecuredService extends Thread implements Runnable {
 	private ObjectOutputStream outO;
 
 	public BlackboardAESSecuredService(BlackboardWebService blackboard, Socket accept, SecretKey ASAESKey) {
-		this.ID = 1;
 		this.clientSocket = accept;
 		this.ASKey = ASAESKey;
 		this.blackboard = blackboard;

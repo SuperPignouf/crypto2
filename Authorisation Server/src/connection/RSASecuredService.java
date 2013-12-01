@@ -8,7 +8,6 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.security.SecureRandom;
-import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 
@@ -69,7 +68,6 @@ public class RSASecuredService extends Thread implements Runnable {
 		} catch (BadPaddingException e) {
 			e.printStackTrace();
 		} catch (CertificateException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -134,7 +132,6 @@ public class RSASecuredService extends Thread implements Runnable {
 			try {
 				createAndSendWSClientAESKeyToUser();
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -161,7 +158,7 @@ public class RSASecuredService extends Thread implements Runnable {
 		this.clientPubKey = this.dbLink.getCertificateByUserID(this.clientID).getPublicKey();
 		if (this.clientPubKey == null) System.out.println("ERREUR : l'ID " + this.clientID + " n'est pas reconnue");
 		if(this.clientID == 1 || this.clientID == 2) { // When the Client is a Web Service (blackboard or keychain).
-			SealedObject encryptedWSID = (SealedObject) in.readObject();
+			//SealedObject encryptedWSID = (SealedObject) in.readObject();
 			SealedObject encryptedR1 = (SealedObject) in.readObject();
 			this.r1 = (Integer) encryptedR1.getObject(cipher);
 			System.out.println("AS: ID received from the client (WS): " + this.clientID);
@@ -169,8 +166,8 @@ public class RSASecuredService extends Thread implements Runnable {
 		}
 		else if(this.clientID > 2){ // When the Client is a user.
 			this.WSID = (Integer) in.readObject();
-			SealedObject encryptedClientID = (SealedObject) in.readObject();
-			SealedObject encryptedWSID = (SealedObject) in.readObject();
+			//SealedObject encryptedClientID = (SealedObject) in.readObject();
+			//SealedObject encryptedWSID = (SealedObject) in.readObject();
 			SealedObject encryptedR3 = (SealedObject) in.readObject();
 			this.r3 = (Integer) encryptedR3.getObject(cipher);
 			
