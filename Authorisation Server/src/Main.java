@@ -8,7 +8,6 @@ import java.security.spec.InvalidKeySpecException;
 
 import connection.AuthorisationServer;
 import crypto.RsaKey;
-import dataBase.DbLink;
 
 /**
  * Main class: Creates the Authorisation Server.
@@ -30,26 +29,19 @@ public class Main {
 			//AuthorisationServer AS = new AuthorisationServer(new RsaKey(dbLink));
 			AuthorisationServer AS = new AuthorisationServer(new RsaKey());
 		} catch (NoSuchAlgorithmException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (InvalidKeyException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (CertificateException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (NoSuchProviderException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (SignatureException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		catch (InvalidKeySpecException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
