@@ -78,13 +78,15 @@ public class BlackboardAESSecuredService extends Thread implements Runnable {
 		this.outO.writeObject(encryptedMsg);
 		this.outO.flush();
 		
-		while(msg!="") { //TODO add cryptotime
+		System.out.println("\n"+"------- BLACKBOARD -------");
+		while(!msg.equals(" ")) { //TODO add cryptotime
 			cipher.init(Cipher.DECRYPT_MODE, idaes.getAES());
 			this.in = new ObjectInputStream(this.clientSocket.getInputStream());
 			SealedObject ClientMsg = (SealedObject) in.readObject();
 			msg = (String) ClientMsg.getObject(cipher);
 			System.out.println(msg);
 		}
+		System.out.println("END");
 	}
 
 	private void receiveUserIDAndBlackboardUserKey() throws IOException, ClassNotFoundException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {

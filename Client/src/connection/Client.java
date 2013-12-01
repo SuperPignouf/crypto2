@@ -105,8 +105,8 @@ public class Client {
 			outO = new ObjectOutputStream(toWS.getOutputStream());
 			outO.writeObject(request);
 			outO.flush();
-		} while(req!="");
-		System.out.println("end");
+		} while(!req.equals(" "));
+		System.out.println("END");
 	}
 	
 	private void sendRequestToKeychain() throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, IOException, IllegalBlockSizeException, ClassNotFoundException, BadPaddingException {
