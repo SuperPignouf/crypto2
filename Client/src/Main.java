@@ -12,7 +12,7 @@ import crypto.RsaKey;
 public class Main {
 	public static void main(String[] args){
 		try {
-			/*Client client = */new Client(new RsaKey());
+			new Client(new RsaKey());
 		} catch (InvalidKeyException e) {
 			e.printStackTrace();
 		} catch (NumberFormatException e) {
