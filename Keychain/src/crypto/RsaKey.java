@@ -77,7 +77,7 @@ public class RsaKey {
 		return this.myCert.getPublicKey();
 	}
 
-	boolean verify(Certificate cert){
+	public boolean verify(Certificate cert){
 		try {
 			cert.verify(this.adminCert.getPublicKey());
 		} catch (InvalidKeyException e) {

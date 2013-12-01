@@ -9,6 +9,7 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.security.SecureRandom;
+import java.security.cert.Certificate;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -50,36 +51,23 @@ public class KeychainToAuthorisationServerUsingRSA {
 		this.ID = ID;
 		this.rsaKey = rsaKey;
 		initConnection();
-		sendPubKey();
-		receiveASPubKey();
+		receiveASCertificate();
 		needhamSchroeder();
 		receiveASKeychainAESKey();
 		// TODO Need to see if the verifications associated the Needham-Schroeder protocol succeeded
 		// and that the Client can have access to the asked service.
 		closeConnection();
 	}
+	
+	private void receiveASCertificate() throws IOException, ClassNotFoundException {
+		ObjectInputStream in = new ObjectInputStream(this.toAS.getInputStream());
+		Certificate AScert = (Certificate)in.readObject();
+		if (this.rsaKey.verify(AScert)) this.ASPubKey = AScert.getPublicKey();
+		else System.out.println("ERREUR : Certificat de l'AS invalide");
+	}
 
 	private void initConnection() throws IOException{
 		toAS = new Socket("localhost", 2442);
-	}
-	
-	// TODO It's the admin who must generate the keys.
-	private void sendPubKey() throws IOException {
-		System.out.println("PUBLIC KEYS");
-		ObjectOutputStream outO = new ObjectOutputStream(this.toAS.getOutputStream());
-		outO.writeObject(this.rsaKey.getPubKey());
-		outO.flush();
-		
-		System.out.println("KEYCHAIN: Public key sent to the authorisation server: " + this.rsaKey.getPubKey());
-	}
-	
-	// TODO It's the admin who must generate the keys.
-	private void receiveASPubKey() throws IOException, ClassNotFoundException {
-
-		ObjectInputStream keyIn = new ObjectInputStream(this.toAS.getInputStream());
-		this.ASPubKey = (PublicKey)keyIn.readObject();
-		
-		System.out.println("KEYCHAIN: Public key received from the server: " + this.ASPubKey);
 	}
 	
 	/**

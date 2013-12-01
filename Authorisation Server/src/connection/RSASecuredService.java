@@ -10,6 +10,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.cert.Certificate;
+import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 
 import javax.crypto.BadPaddingException;
@@ -50,8 +51,7 @@ public class RSASecuredService extends Thread implements Runnable {
 	@Override
 	public void run() {
 		try {
-			sendPubKey();
-			//sendCertificate();
+			sendCertificate();
 			needhamSchroeder();
 			closeConnection();
 		} catch (IOException e) {
@@ -74,14 +74,14 @@ public class RSASecuredService extends Thread implements Runnable {
 		}
 	}
 	
-	// TODO It's the admin who must generate the keys.
-	private void sendPubKey() throws IOException {
-		System.out.println("PUBLIC KEYS");
+	private void sendCertificate() throws IOException, CertificateEncodingException {
+		System.out.println("AS CERTIFICATE");
 		ObjectOutputStream outO = new ObjectOutputStream(this.clientSocket.getOutputStream());
-		outO.writeObject(this.rsaKey.getPubKey());
+		outO.writeObject(this.rsaKey.getCert());
 		outO.flush();
 		
-		System.out.println("AS: Public key sent to the client: " + this.rsaKey.getPubKey());
+		System.out.println("AS: Certificate sent to the client: " + this.rsaKey.getCert());
+		
 	}
 	
 

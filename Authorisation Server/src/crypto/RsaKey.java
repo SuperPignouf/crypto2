@@ -92,6 +92,10 @@ public class RsaKey {
 		return this.privKey;
 	}
 	
+	public Certificate getCert(){
+		return this.myCert;
+	}
+	
 
 }
 

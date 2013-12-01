@@ -54,11 +54,11 @@ public class KeychainWebService {
 	}
 	
 	/**
-	 * Initializes the socket (port 4224).
+	 * Initializes the socket (port 4225).
 	 * @throws IOException
 	 */
 	private void initSocketConnection() throws IOException {
-		this.myService = new ServerSocket(4224);
+		this.myService = new ServerSocket(4225);
 		
 	}
 	
