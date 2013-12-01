@@ -132,7 +132,6 @@ public class RSASecuredService extends Thread implements Runnable {
 			System.out.println("\nAES:");
 			System.out.println("AS: Distribution of the symmetric key...");
 			createAndSendWSClientAESKeyToUser();
-			this.AS.transmitWSClientAESKeyToWS(this.WSClientAESKey, this.WSID, this.clientID);
 		}
 	}
 	
@@ -312,7 +311,9 @@ public class RSASecuredService extends Thread implements Runnable {
 		KeyGenerator keyGen = KeyGenerator.getInstance("AES");
 		keyGen.init(256);
 		this.WSClientAESKey = keyGen.generateKey();
-
+		
+		this.AS.transmitWSClientAESKeyToWS(this.WSClientAESKey, this.WSID, this.clientID);
+		
 		Cipher cipher = Cipher.getInstance("RSA");
 		cipher.init(Cipher.ENCRYPT_MODE, this.clientPubKey);
 		
