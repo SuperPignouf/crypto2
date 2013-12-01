@@ -6,7 +6,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.util.List;
+import java.util.ArrayList;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
@@ -27,7 +27,7 @@ public class KeychainWebService {
 	private ServerSocket myService;
 	private Socket clientSocket = null;
 	private Thread t;
-	private List<IDAES> IDAESList; // List of keys allowing to communicate with Clients and ID's of corresponding Clients.
+	private ArrayList<IDAES> IDAESList = new ArrayList<IDAES>(); // List of keys allowing to communicate with Clients and ID's of corresponding Clients.
 
 	public KeychainWebService(RsaKey rsaKey) throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, IOException, ClassNotFoundException {
 		KeychainToAuthorisationServerUsingRSA TAS = new KeychainToAuthorisationServerUsingRSA(this, this.ID, rsaKey);

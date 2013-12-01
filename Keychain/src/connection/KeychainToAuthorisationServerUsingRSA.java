@@ -54,8 +54,6 @@ public class KeychainToAuthorisationServerUsingRSA {
 		receiveASCertificate();
 		needhamSchroeder();
 		receiveASKeychainAESKey();
-		// TODO Need to see if the verifications associated the Needham-Schroeder protocol succeeded
-		// and that the Client can have access to the asked service.
 		closeConnection();
 	}
 	

@@ -1,4 +1,3 @@
-
 package connection;
 
 import java.io.IOException;
@@ -40,6 +39,7 @@ public class RSASecuredService extends Thread implements Runnable {
 	private DbLink dbLink;
 	
 	public RSASecuredService(AuthorisationServer AS, Socket clientSocket, RsaKey rsaKey, int ID, int cryptoperiod, DbLink dbLink) {
+
 		this.AS = AS;
 		this.ID = ID;
 		this.cryptoperiod = cryptoperiod;

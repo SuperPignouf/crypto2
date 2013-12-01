@@ -30,7 +30,8 @@ public class ClientToAuthorisationServerUsingRSA {
 	private RsaKey rsaKey;
 	private PublicKey ASPubKey;
 	private SecretKey WSClientAESKey;
-	private Socket toAS, toWS1, toWS2;
+	private Socket toAS;
+	
 	
 	public ClientToAuthorisationServerUsingRSA(int WSID, RsaKey rsaKey) throws IOException, ClassNotFoundException, InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException{
 		// TODO Need to modify the creation of the ID.
