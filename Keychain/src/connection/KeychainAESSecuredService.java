@@ -68,7 +68,7 @@ public class KeychainAESSecuredService extends Thread implements Runnable {
 		
 	}
 	
-	private void runService(IDAES idaes) throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, IOException, IllegalBlockSizeException{
+	private void runService(IDAES idaes) throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, IOException, IllegalBlockSizeException, BadPaddingException, ClassNotFoundException{
 		Cipher cipher = Cipher.getInstance("AES");
 		cipher.init(Cipher.ENCRYPT_MODE, idaes.getAES());
 		//ObjectOutputStream outO = new ObjectOutputStream(this.clientSocket.getOutputStream());
@@ -77,6 +77,16 @@ public class KeychainAESSecuredService extends Thread implements Runnable {
 		SealedObject encryptedMsg = new SealedObject (msg, cipher);
 		outO.writeObject(encryptedMsg);
 		outO.flush();
+		
+		System.out.println("\n"+"------- KEYCHAIN -------");
+		while(!msg.equals(" ")) { //TODO add cryptotime
+			cipher.init(Cipher.DECRYPT_MODE, idaes.getAES());
+			this.in = new ObjectInputStream(this.clientSocket.getInputStream());
+			SealedObject ClientMsg = (SealedObject) in.readObject();
+			msg = (String) ClientMsg.getObject(cipher);
+			System.out.println(msg);
+		}
+		System.out.println("END");
 		
 	}
 
