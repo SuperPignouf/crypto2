@@ -17,7 +17,7 @@ import javax.crypto.SecretKey;
 import crypto.RsaKey;
 
 /**
- * The "main" class of the AS. It creates the Authorisation Server, connects with clients using RSA encryption and finally transmits 
+ * The "main" class of the AS. It creates the Authorization Server, connects with clients using RSA encryption and finally transmits 
  */
 public class AuthorisationServer {
 
