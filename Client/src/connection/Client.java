@@ -1,14 +1,17 @@
 package connection;
 
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Scanner;
 
 import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SealedObject;
 import javax.crypto.SecretKey;
 
 import crypto.RsaKey;
@@ -66,7 +69,19 @@ public class Client {
 		this.toWS = new Socket("localhost", 4242);
 	}
 	
-	private void sendRequestToWS() {
-		
+	private void sendRequestToWS() throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, IOException, IllegalBlockSizeException {
+		Cipher cipher = Cipher.getInstance("AES");
+		cipher.init(Cipher.ENCRYPT_MODE, this.WSClientAESKey);
+		String req="";
+		do {
+			System.out.println("Please enter what you want to send to the Web Service:");
+			Scanner sc = new Scanner(System.in);
+			req = sc.next();
+			SealedObject request = new SealedObject(req, cipher);
+			ObjectOutputStream outO = new ObjectOutputStream(toWS.getOutputStream());
+			outO.writeObject(request);
+			outO.flush();
+		} while(req!="");
+		System.out.println("end");
 	}
 }
