@@ -34,7 +34,7 @@ public class BlackboardAESSecuredService extends Thread implements Runnable {
 	}
 	
 	/**
-	 * Receives messages from the AS and requests from User
+	 * Receives messages from the AS and requests from User.
 	 */
 	@Override
 	public void run() {
