@@ -96,13 +96,20 @@ public class AuthorisationServer {
 	 */
 	public void transmitWSClientAESKeyToWS(SecretKey WSClientAESKey, int WSID, int clientID) throws UnknownHostException, IOException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException { 
 		Socket toWS = null;
-		if (WSID == 1) // If Blackboard.
+		Cipher cipher = null;
+		if (WSID == 1) { // If Blackboard.
 			toWS = new Socket("localhost", 4224);
-		else if (WSID == 2) // If Keychain.
+			System.out.println("AS: Connexion to Blackboard.");
+			cipher = Cipher.getInstance("AES");
+			cipher.init(Cipher.ENCRYPT_MODE, this.ASBlackboardAESKey);
+		}
+		else if (WSID == 2) { // If Keychain.
 			toWS = new Socket("localhost", 4242);
+			System.out.println("AS: Connexion to Keychain.");
+			cipher = Cipher.getInstance("AES");
+			cipher.init(Cipher.ENCRYPT_MODE, this.ASKeychainAESKey);
+		}
 		
-		Cipher cipher = Cipher.getInstance("AES");
-		cipher.init(Cipher.ENCRYPT_MODE, this.ASBlackboardAESKey);
 		SealedObject encryptedClientID = new SealedObject(clientID, cipher);
 		SealedObject encryptedBlackboardClientAESKey = new SealedObject(WSClientAESKey.getEncoded(), cipher);
 		SealedObject encryptedCryptoperiod = new SealedObject(this.cryptoperiod, cipher);

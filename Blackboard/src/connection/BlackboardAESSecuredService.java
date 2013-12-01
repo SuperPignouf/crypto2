@@ -23,6 +23,8 @@ public class BlackboardAESSecuredService extends Thread implements Runnable {
 	private Socket clientSocket;
 	private SecretKey ASKey; // La cle de session AES permettant de communiquer avec l'AS
 	private BlackboardWebService blackboard;
+	private ObjectInputStream in;
+	private ObjectOutputStream outO;
 
 	public BlackboardAESSecuredService(BlackboardWebService blackboard, Socket accept, SecretKey ASAESKey) {
 		this.ID = 1;
@@ -37,6 +39,8 @@ public class BlackboardAESSecuredService extends Thread implements Runnable {
 	@Override
 	public void run() {
 		try {
+			this.in = new ObjectInputStream(this.clientSocket.getInputStream());
+			this.outO = new ObjectOutputStream(this.clientSocket.getOutputStream());
 			identifyClient();
 			if (this.clientID == 0){ // AS
 				System.out.println("BLACKBOARD : AS identified");
@@ -67,23 +71,22 @@ public class BlackboardAESSecuredService extends Thread implements Runnable {
 	private void runService(IDAES idaes) throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, IOException, IllegalBlockSizeException{
 		Cipher cipher = Cipher.getInstance("AES");
 		cipher.init(Cipher.ENCRYPT_MODE, idaes.getAES());
-		ObjectOutputStream outO = new ObjectOutputStream(this.clientSocket.getOutputStream());
+		//ObjectOutputStream outO = new ObjectOutputStream(this.clientSocket.getOutputStream());
 		
 		String msg = "Bonjour client, je suis un Blackboard";
 		SealedObject encryptedMsg = new SealedObject (msg, cipher);
-		outO.writeObject(encryptedMsg);
-		outO.flush();
+		this.outO.writeObject(encryptedMsg);
+		this.outO.flush();
 		
 	}
 
 	private void receiveUserIDAndBlackboardUserKey() throws IOException, ClassNotFoundException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
 		Cipher cipher = Cipher.getInstance("AES");
 		cipher.init(Cipher.DECRYPT_MODE, this.ASKey);
-		System.out.println(this.clientSocket.getInputStream());
-		ObjectInputStream in = new ObjectInputStream(this.clientSocket.getInputStream());
-		SealedObject encryptedUserID = (SealedObject) in.readObject();
-		SealedObject encryptedClientKey = (SealedObject) in.readObject();
-		SealedObject encryptedCryptoperiod = (SealedObject) in.readObject();
+		//ObjectInputStream in = new ObjectInputStream(this.clientSocket.getInputStream());
+		SealedObject encryptedUserID = (SealedObject) this.in.readObject();
+		SealedObject encryptedClientKey = (SealedObject) this.in.readObject();
+		SealedObject encryptedCryptoperiod = (SealedObject) this.in.readObject();
 		this.userID = (Integer) encryptedUserID.getObject(cipher);
 		byte[] userKey = new byte[32];
 		userKey = (byte[]) encryptedClientKey.getObject(cipher);
@@ -95,8 +98,7 @@ public class BlackboardAESSecuredService extends Thread implements Runnable {
 	}
 
 	private void identifyClient() throws IOException, ClassNotFoundException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException {
-		ObjectInputStream in = new ObjectInputStream(this.clientSocket.getInputStream());
-		this.clientID = (Integer) in.readObject();
+		this.clientID = (Integer) this.in.readObject();
 	}
 
 }

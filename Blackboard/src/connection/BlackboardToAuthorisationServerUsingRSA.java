@@ -53,8 +53,6 @@ public class BlackboardToAuthorisationServerUsingRSA {
 		receiveASPubKey();
 		needhamSchroeder();
 		receiveASWSAESKey();
-		// TODO Need to see if the verifications associated the Needham-Schroeder protocol succeeded
-		// and that the Client can have access to the asked service.
 		closeConnection();
 	}
 
@@ -76,7 +74,7 @@ public class BlackboardToAuthorisationServerUsingRSA {
 	private void receiveASPubKey() throws IOException, ClassNotFoundException {
 
 		ObjectInputStream keyIn = new ObjectInputStream(this.toAS.getInputStream());
-		this.ASPubKey = (PublicKey)keyIn.readObject();
+		this.ASPubKey = (PublicKey) keyIn.readObject();
 		
 		System.out.println("BLACKBOARD: Public key received from the server: " + this.ASPubKey);
 	}

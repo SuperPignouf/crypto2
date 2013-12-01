@@ -33,12 +33,13 @@ public class RSASecuredService extends Thread implements Runnable {
 	private int cryptoperiod;
 	private SecretKey ASWSAESKey, WSClientAESKey;
 	
-	public RSASecuredService(AuthorisationServer AS, Socket clientSocket, RsaKey rsaKey, int ID, int cryptoperiod) {
+	public RSASecuredService(AuthorisationServer AS, Socket clientSocket, RsaKey rsaKey, int ID, int cryptoperiod) throws IOException {
 		this.AS = AS;
 		this.ID = ID;
 		this.cryptoperiod = cryptoperiod;
 		this.clientSocket = clientSocket;
 		this.rsaKey = rsaKey;
+		System.out.println("test");
 	}
 
 	@Override
