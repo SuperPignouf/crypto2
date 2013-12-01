@@ -58,10 +58,10 @@ public class ClientToASCommunicationUsingRSA {
 	private void sendPubKey() throws IOException {
 		System.out.println("PUBLIC KEYS");
 		ObjectOutputStream outO = new ObjectOutputStream(this.toAS.getOutputStream());
-		outO.writeObject(this.rsaKey.getKeyPair().getPublic());
+		outO.writeObject(this.rsaKey.getPubKey());
 		outO.flush();
 		
-		System.out.println("CLIENT: Public key sent to the authorization server: " + this.rsaKey.getKeyPair().getPublic());
+		System.out.println("CLIENT: Public key sent to the authorization server: " + this.rsaKey.getPubKey());
 	}
 	
 	// TODO It's the admin who must generate the keys.
@@ -140,7 +140,7 @@ public class ClientToASCommunicationUsingRSA {
 	private boolean receiveIDsAndNoncesFromAS() throws IllegalBlockSizeException, BadPaddingException, IOException, ClassNotFoundException, InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException {
 		boolean result = false;
 		Cipher cipher = Cipher.getInstance("RSA");
-		cipher.init(Cipher.DECRYPT_MODE, this.rsaKey.getKeyPair().getPrivate());
+		cipher.init(Cipher.DECRYPT_MODE, this.rsaKey.getPrivKey());
 		ObjectInputStream in = new ObjectInputStream(this.toAS.getInputStream());
 		SealedObject encryptedASID = (SealedObject) in.readObject();
 		SealedObject encryptedWSID = (SealedObject) in.readObject();
@@ -192,7 +192,7 @@ public class ClientToASCommunicationUsingRSA {
 	 */
 	private void receiveWSClientAESKey() throws IOException, ClassNotFoundException, InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException {
 		Cipher cipher = Cipher.getInstance("RSA");
-		cipher.init(Cipher.DECRYPT_MODE, this.rsaKey.getKeyPair().getPrivate());
+		cipher.init(Cipher.DECRYPT_MODE, this.rsaKey.getPrivKey());
 		ObjectInputStream in = new ObjectInputStream(this.toAS.getInputStream());
 		SealedObject encryptedSessionKey = (SealedObject) in.readObject();
 		SealedObject encryptedCryptoperiod = (SealedObject) in.readObject();

@@ -3,9 +3,12 @@ package dataBase;
 import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.security.KeyFactory;
+import java.security.NoSuchAlgorithmException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
+import java.security.spec.X509EncodedKeySpec;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -44,34 +47,41 @@ public class DbLink {
 			System.out.println("Failed to make connection!");
 		}
 	}
-	
-	
-	public Certificate getCertificateByUserID(int ID){
-		
+
+
+	public Certificate getCertificateByUserID(int ID) throws NoSuchAlgorithmException, CertificateException{
+
 		Certificate result = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		try {
-			ps = con.prepareStatement("SELECT * FROM Certificates where ID = ?");
+			ps = this.con.prepareStatement("SELECT * FROM certificates where ID = ?");
 			ps.setInt (1, ID);
 			rs = ps.executeQuery();
+
+			if(rs.next()){
+				String str = rs.getString("Certificate");
+				System.out.println(str);
+				InputStream is = new ByteArrayInputStream(str.getBytes());
+				CertificateFactory cf = CertificateFactory.getInstance("X.509");
+				result = cf.generateCertificate(is);
+				
+				System.out.println("LOOK HERE : " + result.getEncoded().length);
+
+
 			
+			}
+			System.out.println("ICI : " + rs.getString("Certificate"));
+
 			//System.out.println("cctvmb ?");
-			String str = rs.getString("Certificate");
-			
-			InputStream is = new ByteArrayInputStream(str.getBytes());
-			CertificateFactory cf = CertificateFactory.getInstance("X.509");
-			result = cf.generateCertificate(is);
-			
+
+
 			System.out.println(result);
 
 		} catch (SQLException e) {
 			System.out.println(e);
-		} catch (CertificateException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 		return result; 
 	}
-	
+
 }
