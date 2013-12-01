@@ -19,7 +19,7 @@ import dataContainers.IDAES;
 
 public class KeychainAESSecuredService extends Thread implements Runnable {
 
-	private int ID, clientID, userID; // personal ID, any client's ID (AS ou user), user's ID.
+	private int ID, clientID; // personal ID, any client's ID (AS ou user).
 	private Socket clientSocket;
 	private SecretKey ASKey; // La cle de session AES permettant de communiquer avec l'AS
 	private KeychainWebService keychain;
@@ -43,33 +43,26 @@ public class KeychainAESSecuredService extends Thread implements Runnable {
 			this.outO = new ObjectOutputStream(this.clientSocket.getOutputStream());
 			identifyClient();
 			if (this.clientID == 0){ // AS
-				System.out.println("BLACKBOARD : AS identified");
-				receiveUserIDAndBlackboardUserKey();
+				System.out.println("KEYCHAIN : AS identified");
+				receiveUserIDAndKeychainUserKey();
 			}
-			else if (this.clientID > 2 && this.clientID == this.userID){ // Expected user
-				System.out.println("BLACKBOARD : user identified");
+			else if (this.clientID > 2 && this.clientID == this.keychain.getUserID()){ // Expected user
+				System.out.println("KEYCHAIN : user identified");
 				runService(this.keychain.getIDAES(this.clientID));
 			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (InvalidKeyException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IllegalBlockSizeException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (BadPaddingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (NoSuchAlgorithmException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (NoSuchPaddingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -87,25 +80,26 @@ public class KeychainAESSecuredService extends Thread implements Runnable {
 		
 	}
 
-	private void receiveUserIDAndBlackboardUserKey() throws IOException, ClassNotFoundException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
+	private void receiveUserIDAndKeychainUserKey() throws IOException, ClassNotFoundException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
 		Cipher cipher = Cipher.getInstance("AES");
 		cipher.init(Cipher.DECRYPT_MODE, this.ASKey);
 		//ObjectInputStream in = new ObjectInputStream(this.clientSocket.getInputStream());
 		SealedObject encryptedUserID = (SealedObject) this.in.readObject();
 		SealedObject encryptedClientKey = (SealedObject) this.in.readObject();
 		SealedObject encryptedCryptoperiod = (SealedObject) this.in.readObject();
-		this.userID = (Integer) encryptedUserID.getObject(cipher);
+		this.keychain.setUserID((Integer) encryptedUserID.getObject(cipher));
 		byte[] userKey = new byte[32];
 		userKey = (byte[]) encryptedClientKey.getObject(cipher);
 		this.keychain.addIDAES((Integer) encryptedUserID.getObject(cipher), (Integer) encryptedCryptoperiod.getObject(cipher), new SecretKeySpec(userKey, 0, 32, "AES")); // L'id de l'user et la cle associee sont stockees dans l'objet serviceServer
 		
-		System.out.println("KEYCHAIN : received user ID : " + this.userID);
+		System.out.println("KEYCHAIN : received user ID : " + this.keychain.getUserID());
 		System.out.println("KEYCHAIN : received related session AES key : " + new SecretKeySpec(userKey, 0, 32, "AES"));
 		System.out.println("KEYCHAIN : received cryptoperiod of that key : " + (Integer) encryptedCryptoperiod.getObject(cipher) + "sec");
 	}
 
 	private void identifyClient() throws IOException, ClassNotFoundException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException {
 		this.clientID = (Integer) this.in.readObject();
+		System.out.println("KEYCHAIN : received client ID : " + this.clientID);
 	}
 
 }

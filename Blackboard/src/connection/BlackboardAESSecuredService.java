@@ -19,7 +19,7 @@ import dataContainers.IDAES;
 
 public class BlackboardAESSecuredService extends Thread implements Runnable {
 
-	private int ID, clientID, userID; // personal ID, any client's ID (AS ou user), user's ID.
+	private int ID, clientID; // personal ID, any client's ID (AS ou user).
 	private Socket clientSocket;
 	private SecretKey ASKey; // La cle de session AES permettant de communiquer avec l'AS
 	private BlackboardWebService blackboard;
@@ -46,7 +46,7 @@ public class BlackboardAESSecuredService extends Thread implements Runnable {
 				System.out.println("BLACKBOARD : AS identified");
 				receiveUserIDAndBlackboardUserKey();
 			}
-			else if (this.clientID > 2 && this.clientID == this.userID){ // Expected user
+			else if (this.clientID > 2 && this.clientID == this.blackboard.getUserID()){ // Expected user
 				System.out.println("BLACKBOARD : user identified");
 				runService(this.blackboard.getIDAES(this.clientID));
 			}
@@ -94,12 +94,12 @@ public class BlackboardAESSecuredService extends Thread implements Runnable {
 		SealedObject encryptedUserID = (SealedObject) this.in.readObject();
 		SealedObject encryptedClientKey = (SealedObject) this.in.readObject();
 		SealedObject encryptedCryptoperiod = (SealedObject) this.in.readObject();
-		this.userID = (Integer) encryptedUserID.getObject(cipher);
+		this.blackboard.setUserID((Integer) encryptedUserID.getObject(cipher));
 		byte[] userKey = new byte[32];
 		userKey = (byte[]) encryptedClientKey.getObject(cipher);
 		this.blackboard.addIDAES((Integer) encryptedUserID.getObject(cipher), (Integer) encryptedCryptoperiod.getObject(cipher), new SecretKeySpec(userKey, 0, 32, "AES")); // L'id de l'user et la cle associee sont stockees dans l'objet serviceServer
 		
-		System.out.println("BLACKBOARD : received user ID : " + this.userID);
+		System.out.println("BLACKBOARD : received user ID : " + this.blackboard.getUserID());
 		System.out.println("BLACKBOARD : received related session AES key : " + new SecretKeySpec(userKey, 0, 32, "AES"));
 		System.out.println("BLACKBOARD : received cryptoperiod of that key : " + (Integer) encryptedCryptoperiod.getObject(cipher) + "sec");
 	}
