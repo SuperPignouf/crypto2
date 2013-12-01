@@ -2,6 +2,7 @@ package connection;
 
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.net.Socket;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
@@ -23,6 +24,8 @@ public class BlackboardWebService {
 	private int ID = 1;
 	private SecretKey ASBlackboardAESKey; // The AS-Blackboard AES session key.
 	private ServerSocket myService;
+	private Socket clientSocket = null;
+	private Thread t;
 	private List<IDAES> IDAESList; // List of keys allowing to communicate with Clients and ID's of corresponding Clients.
 
 	public BlackboardWebService(RsaKey rsaKey) throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, IOException, ClassNotFoundException {
@@ -38,9 +41,10 @@ public class BlackboardWebService {
 	private void acceptConnections() {
 		while(true){			
 			try {
-				//Service BB = new Service(this.myService.accept());
-				//BB.run();
-				new BlackboardAESSecuredService(this.myService.accept(), this.ASBlackboardAESKey, this).run();
+				this.clientSocket = this.myService.accept();
+				System.out.println("BLACKBOARD: Someone wants to connect.");
+				t = new Thread(new BlackboardAESSecuredService(this, this.clientSocket, this.ASBlackboardAESKey));
+				t.start();
 			}
 			catch (IOException e) {
 				System.out.println(e);

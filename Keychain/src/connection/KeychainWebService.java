@@ -2,6 +2,7 @@ package connection;
 
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.net.Socket;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
@@ -23,6 +24,8 @@ public class KeychainWebService {
 	private int ID = 2;
 	private SecretKey ASKeychainAESKey; // The AS-Keychain AES session key.
 	private ServerSocket myService;
+	private Socket clientSocket = null;
+	private Thread t;
 	private List<IDAES> IDAESList; // List of keys allowing to communicate with Clients and ID's of corresponding Clients.
 
 	public KeychainWebService(RsaKey rsaKey) throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, IOException, ClassNotFoundException {
@@ -38,9 +41,10 @@ public class KeychainWebService {
 	private void acceptConnections() {
 		while(true){			
 			try {
-				//Service BB = new Service(this.myService.accept());
-				//BB.run();
-				new KeychainAESSecuredService(this.myService.accept(), this.ASKeychainAESKey, this).run();
+				this.clientSocket = this.myService.accept();
+				System.out.println("KEYCHAIN: Someone wants to connect.");
+				t = new Thread(new KeychainAESSecuredService(this, this.clientSocket, this.ASKeychainAESKey));
+				t.start();
 			}
 			catch (IOException e) {
 				System.out.println(e);

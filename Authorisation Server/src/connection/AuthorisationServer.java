@@ -25,6 +25,8 @@ public class AuthorisationServer {
 	private int cryptoperiod = 7200;
 	private SecretKey ASBlackboardAESKey, ASKeychainAESKey;
 	private ServerSocket myService;
+	private Socket clientSocket = null;
+	private Thread t;
 
 	/**
 	 * Constructor: creates the Authorization Server.
@@ -45,7 +47,10 @@ public class AuthorisationServer {
 	private void acceptConnections(RsaKey rsaKey) {
 		while(true){			
 			try {
-				new RSASecuredService(this, this.myService.accept(), rsaKey, this.ID, this.cryptoperiod).run();
+				this.clientSocket = this.myService.accept();
+				System.out.println("AS: Someone wants to connect.");
+				t = new Thread(new RSASecuredService(this, this.clientSocket, rsaKey, this.ID, this.cryptoperiod));
+				;
 			} catch (IOException e) {
 				System.out.println(e);
 			}					    

@@ -24,11 +24,11 @@ public class KeychainAESSecuredService extends Thread implements Runnable {
 	private SecretKey ASKey; // La cle de session AES permettant de communiquer avec l'AS
 	private KeychainWebService keychain;
 
-	public KeychainAESSecuredService(Socket accept, SecretKey ASAESKey, KeychainWebService blackboard) {
+	public KeychainAESSecuredService(KeychainWebService keychain, Socket accept, SecretKey ASAESKey) {
 		this.ID = 1;
 		this.clientSocket = accept;
 		this.ASKey = ASAESKey;
-		this.keychain = blackboard;
+		this.keychain = keychain;
 	}
 	
 	/**

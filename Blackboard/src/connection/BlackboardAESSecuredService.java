@@ -24,7 +24,7 @@ public class BlackboardAESSecuredService extends Thread implements Runnable {
 	private SecretKey ASKey; // La cle de session AES permettant de communiquer avec l'AS
 	private BlackboardWebService blackboard;
 
-	public BlackboardAESSecuredService(Socket accept, SecretKey ASAESKey, BlackboardWebService blackboard) {
+	public BlackboardAESSecuredService(BlackboardWebService blackboard, Socket accept, SecretKey ASAESKey) {
 		this.ID = 1;
 		this.clientSocket = accept;
 		this.ASKey = ASAESKey;
@@ -86,6 +86,7 @@ public class BlackboardAESSecuredService extends Thread implements Runnable {
 	private void receiveUserIDAndBlackboardUserKey() throws IOException, ClassNotFoundException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
 		Cipher cipher = Cipher.getInstance("AES");
 		cipher.init(Cipher.DECRYPT_MODE, this.ASKey);
+		System.out.println(this.clientSocket.getInputStream());
 		ObjectInputStream in = new ObjectInputStream(this.clientSocket.getInputStream());
 		SealedObject encryptedUserID = (SealedObject) in.readObject();
 		SealedObject encryptedClientKey = (SealedObject) in.readObject();
