@@ -47,6 +47,7 @@ public class KeychainAESSecuredService extends Thread implements Runnable {
 				receiveUserIDAndKeychainUserKey();
 			}
 			else if (this.clientID > 2 && this.clientID == this.keychain.getUserID()){ // Expected user
+				sleep(1000);
 				System.out.println("KEYCHAIN : user identified");
 				runService(this.keychain.getIDAES(this.clientID));
 			}
@@ -63,6 +64,8 @@ public class KeychainAESSecuredService extends Thread implements Runnable {
 		} catch (NoSuchAlgorithmException e) {
 			e.printStackTrace();
 		} catch (NoSuchPaddingException e) {
+			e.printStackTrace();
+		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
 		
