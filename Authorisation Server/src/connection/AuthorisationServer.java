@@ -17,6 +17,7 @@ import javax.crypto.SealedObject;
 import javax.crypto.SecretKey;
 
 import crypto.RsaKey;
+import dataBase.DbLink;
 
 /**
  * The "main" class of the AS. It creates the Authorization Server, connects with clients using RSA encryption and finally transmits 
@@ -29,13 +30,15 @@ public class AuthorisationServer {
 	private ServerSocket myService;
 	private Socket clientSocket = null;
 	private Thread t;
+	private DbLink dbLink;
 
 	/**
 	 * Constructor: creates the Authorization Server.
 	 * @param rsaKey - The pair of keys (public and private) RSA.
 	 * @throws IOException
 	 */
-	public AuthorisationServer(RsaKey rsaKey) throws IOException{
+	public AuthorisationServer(RsaKey rsaKey, DbLink dbLink) throws IOException{
+		this.dbLink = dbLink;
 		initSocketConnection();
 		acceptConnections(rsaKey);
 	}
@@ -51,7 +54,7 @@ public class AuthorisationServer {
 			try {
 				this.clientSocket = this.myService.accept();
 				System.out.println("\nAS: Someone wants to connect.");
-				t = new Thread(new RSASecuredService(this, this.clientSocket, rsaKey, this.ID, this.cryptoperiod));
+				t = new Thread(new RSASecuredService(this, this.clientSocket, rsaKey, this.ID, this.cryptoperiod, this.dbLink));
 				t.start();
 			} catch (IOException e) {
 				System.out.println(e);

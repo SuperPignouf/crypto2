@@ -9,6 +9,8 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.security.SecureRandom;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -19,6 +21,7 @@ import javax.crypto.SealedObject;
 import javax.crypto.SecretKey;
 
 import crypto.RsaKey;
+import dataBase.DbLink;
 
 /**
  * Class for connecting to Clients (WS or user) using RSA encryption.
@@ -33,20 +36,22 @@ public class RSASecuredService extends Thread implements Runnable {
 	private int r1, r2, r3; // TODO r2 = r4 OK ?
 	private int cryptoperiod;
 	private SecretKey ASWSAESKey, WSClientAESKey;
+	private DbLink dbLink;
 	
-	public RSASecuredService(AuthorisationServer AS, Socket clientSocket, RsaKey rsaKey, int ID, int cryptoperiod) {
+	public RSASecuredService(AuthorisationServer AS, Socket clientSocket, RsaKey rsaKey, int ID, int cryptoperiod, DbLink dbLink) {
 		this.AS = AS;
 		this.ID = ID;
 		this.cryptoperiod = cryptoperiod;
 		this.clientSocket = clientSocket;
 		this.rsaKey = rsaKey;
+		this.dbLink = dbLink;
 	}
 
 	@Override
 	public void run() {
 		try {
 			sendPubKey();
-			receiveClientPubKey();
+			//sendCertificate();
 			needhamSchroeder();
 			closeConnection();
 		} catch (IOException e) {
@@ -63,6 +68,9 @@ public class RSASecuredService extends Thread implements Runnable {
 			e.printStackTrace();
 		} catch (BadPaddingException e) {
 			e.printStackTrace();
+		} catch (CertificateException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 	
@@ -70,21 +78,12 @@ public class RSASecuredService extends Thread implements Runnable {
 	private void sendPubKey() throws IOException {
 		System.out.println("PUBLIC KEYS");
 		ObjectOutputStream outO = new ObjectOutputStream(this.clientSocket.getOutputStream());
-		//outO.writeObject(this.rsaKey.getPubKey());
 		outO.writeObject(this.rsaKey.getPubKey());
 		outO.flush();
 		
 		System.out.println("AS: Public key sent to the client: " + this.rsaKey.getPubKey());
-		//System.out.println("AS: Public key sent to the client: " + this.rsaKey.getPubKey());
 	}
 	
-	// TODO It's the admin who must generate the keys.
-	private void receiveClientPubKey() throws IOException, ClassNotFoundException  { // Reception cle publique RSA
-		ObjectInputStream keyIn = new ObjectInputStream(this.clientSocket.getInputStream());
-		this.clientPubKey = (PublicKey) keyIn.readObject();
-
-		System.out.println("AS: Public key received from the client: " + clientPubKey);
-	}
 
 	/**
 	 * Launches a Needham-Schroeder protocol between the Client (WS or user) and the AS. 
@@ -95,8 +94,9 @@ public class RSASecuredService extends Thread implements Runnable {
 	 * @throws BadPaddingException
 	 * @throws IOException
 	 * @throws ClassNotFoundException
+	 * @throws CertificateException 
 	 */
-	private void needhamSchroeder() throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, IOException, ClassNotFoundException {
+	private void needhamSchroeder() throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, IOException, ClassNotFoundException, CertificateException {
 		System.out.println("\n\nNEEDHAM-SCHROEDER PROTOCOL:");
 		System.out.println("RSA:");
 		boolean partnerRecognized = false;
@@ -145,15 +145,17 @@ public class RSASecuredService extends Thread implements Runnable {
 	 * @throws BadPaddingException
 	 * @throws IOException
 	 * @throws ClassNotFoundException
+	 * @throws CertificateException 
 	 */
-	private void receiveIdAndNonce() throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, IOException, ClassNotFoundException {
+	private void receiveIdAndNonce() throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, IOException, ClassNotFoundException, CertificateException {
 		Cipher cipher = Cipher.getInstance("RSA");
 		cipher.init(Cipher.DECRYPT_MODE, this.rsaKey.getPrivKey());
-		//cipher.init(Cipher.DECRYPT_MODE, this.rsaKey.getPrivKey());
 
 		ObjectInputStream in = new ObjectInputStream(this.clientSocket.getInputStream());
 
 		this.clientID = (Integer) in.readObject(); // First ID that the AS receives.
+		this.clientPubKey = this.dbLink.getCertificateByUserID(this.clientID).getPublicKey();
+		if (this.clientPubKey == null) System.out.println("ERREUR : l'ID " + this.clientID + " n'est pas reconnue");
 		if(this.clientID == 1 || this.clientID == 2) { // When the Client is a Web Service (blackboard or keychain).
 			SealedObject encryptedWSID = (SealedObject) in.readObject();
 			SealedObject encryptedR1 = (SealedObject) in.readObject();

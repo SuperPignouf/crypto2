@@ -27,7 +27,7 @@ public class Main {
 		DbLink dbLink = new DbLink();
 		
 		try {
-			new AuthorisationServer(new RsaKey(dbLink));
+			new AuthorisationServer(new RsaKey(dbLink), dbLink);
 		} catch (NoSuchAlgorithmException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
