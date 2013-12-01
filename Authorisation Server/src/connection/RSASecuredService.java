@@ -131,7 +131,12 @@ public class RSASecuredService extends Thread implements Runnable {
 			System.out.println("AS: User fully authentified.");
 			System.out.println("\nAES:");
 			System.out.println("AS: Distribution of the symmetric key...");
-			createAndSendWSClientAESKeyToUser();
+			try {
+				createAndSendWSClientAESKeyToUser();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 	
@@ -301,14 +306,15 @@ public class RSASecuredService extends Thread implements Runnable {
 	 * @throws IllegalBlockSizeException
 	 * @throws IOException
 	 * @throws InvalidKeyException
+	 * @throws InterruptedException 
 	 */
-	private void createAndSendWSClientAESKeyToUser() throws NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, IOException, InvalidKeyException {
+	private void createAndSendWSClientAESKeyToUser() throws NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, IOException, InvalidKeyException, InterruptedException {
 		KeyGenerator keyGen = KeyGenerator.getInstance("AES");
 		keyGen.init(256);
 		this.WSClientAESKey = keyGen.generateKey();
 		
 		this.AS.transmitWSClientAESKeyToWS(this.WSClientAESKey, this.WSID, this.clientID);
-		
+		sleep(3000);
 		Cipher cipher = Cipher.getInstance("RSA");
 		cipher.init(Cipher.ENCRYPT_MODE, this.clientPubKey);
 		

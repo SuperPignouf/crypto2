@@ -48,7 +48,6 @@ public class BlackboardAESSecuredService extends Thread implements Runnable {
 			}
 			else if (this.clientID > 2 && this.clientID == this.blackboard.getUserID()){ // Expected user
 				System.out.println("BLACKBOARD : user identified");
-				sleep(1000);
 				runService(this.blackboard.getIDAES(this.clientID));
 			}
 		} catch (IOException e) {
@@ -64,8 +63,6 @@ public class BlackboardAESSecuredService extends Thread implements Runnable {
 		} catch (NoSuchAlgorithmException e) {
 			e.printStackTrace();
 		} catch (NoSuchPaddingException e) {
-			e.printStackTrace();
-		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
 		
