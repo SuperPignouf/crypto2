@@ -100,7 +100,7 @@ public class Client {
 		do {
 			System.out.println("Please enter what you want to send to the Web Service:");
 			Scanner sc = new Scanner(System.in);
-			req = sc.next();
+			req = sc.nextLine();
 			request = new SealedObject(req, cipher);
 			outO = new ObjectOutputStream(toWS.getOutputStream());
 			outO.writeObject(request);
