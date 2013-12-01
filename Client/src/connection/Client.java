@@ -1,6 +1,7 @@
 
 package connection;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
@@ -24,19 +25,21 @@ import crypto.RsaKey;
 public class Client {
 
 	private SecretKey WSClientAESKey; // The AS-WS AES session key.
-	private int WSID;
+	private int ID, WSID;
 	private Socket toWS;
 	
 	public Client(RsaKey rsaKey) throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, IOException, ClassNotFoundException {
+		//this.ID = new Scanner(new File("src/ID.txt")).nextInt(); //TODO
+		this.ID = new Scanner(new File("ID.txt")).nextInt();
 		this.WSID = chooseService();
-		ClientToAuthorisationServerUsingRSA TAS = new ClientToAuthorisationServerUsingRSA(this.WSID, rsaKey);
+		ClientToAuthorisationServerUsingRSA TAS = new ClientToAuthorisationServerUsingRSA(this.ID, this.WSID, rsaKey);
 		this.WSClientAESKey = TAS.getWSClientAESKey(); // Get the WS-Client AES session key from the AS.
 		
-		/*if (this.WSID == 1)
+		if (this.WSID == 1)
 			initConnectionWithBlackboard();
 		else if (this.WSID == 2)
 			initConnectionWithKeychain();
-		sendRequestToWS();*/
+		sendRequestToWS();
 	}
 	
 	/**
@@ -80,6 +83,8 @@ public class Client {
 			req = sc.next();
 			SealedObject request = new SealedObject(req, cipher);
 			ObjectOutputStream outO = new ObjectOutputStream(toWS.getOutputStream());
+			outO.writeObject(this.ID);
+			outO.flush();
 			outO.writeObject(request);
 			outO.flush();
 		} while(req!="");

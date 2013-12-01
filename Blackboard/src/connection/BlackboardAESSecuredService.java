@@ -106,6 +106,7 @@ public class BlackboardAESSecuredService extends Thread implements Runnable {
 
 	private void identifyClient() throws IOException, ClassNotFoundException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException {
 		this.clientID = (Integer) this.in.readObject();
+		System.out.println("BLACKBOARD : received user ID : " + this.clientID);
 	}
 
 }

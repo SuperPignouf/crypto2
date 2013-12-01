@@ -33,11 +33,8 @@ public class ClientToAuthorisationServerUsingRSA {
 	private Socket toAS;
 	
 	
-	public ClientToAuthorisationServerUsingRSA(int WSID, RsaKey rsaKey) throws IOException, ClassNotFoundException, InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException{
-		// TODO Need to modify the creation of the ID.
-		Random randGenerator = new Random();
-		//this.ID = new Scanner(new File("src/ID.txt")).nextInt(); //TODO
-		this.ID = new Scanner(new File("ID.txt")).nextInt();
+	public ClientToAuthorisationServerUsingRSA(int ID, int WSID, RsaKey rsaKey) throws IOException, ClassNotFoundException, InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException{
+		this.ID = ID;
 		this.WSID = WSID;
 		this.rsaKey = rsaKey;
 		
