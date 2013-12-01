@@ -34,8 +34,6 @@ public class ClientToAuthorisationServerUsingRSA {
 	
 	
 	public ClientToAuthorisationServerUsingRSA(int WSID, RsaKey rsaKey) throws IOException, ClassNotFoundException, InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException{
-		// TODO Need to modify the creation of the ID.
-		Random randGenerator = new Random();
 		this.ID = new Scanner(new File("src/ID.txt")).nextInt();
 		this.WSID = WSID;
 		this.rsaKey = rsaKey;
@@ -43,8 +41,6 @@ public class ClientToAuthorisationServerUsingRSA {
 		this.initConnectionWithAS();
 		this.receiveASCertificate();
 		this.needhamSchroederWithAS();
-		// TODO Need to verify of the verifications associated the Needham-Schroeder protocol succeeded
-		// and that the Client can have access to the asked service.
 		this.receiveWSClientAESKey();
 		closeConnection();
 	}
