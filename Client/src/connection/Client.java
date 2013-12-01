@@ -38,11 +38,10 @@ public class Client {
 		
 		if (this.WSID == 1) {
 			initConnectionWithBlackboard();
-			sendRequestToBlackboard();
-		}
-		else if (this.WSID == 2) {
+			sendRequestToWS();
+		} else if (this.WSID == 2) {
 			initConnectionWithKeychain();
-			sendRequestToKeychain();
+			sendRequestToWS();
 		}
 	}
 	
@@ -77,7 +76,7 @@ public class Client {
 		this.toWS = new Socket("localhost", 4225);
 	}
 	
-	private void sendRequestToBlackboard() throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, IOException, IllegalBlockSizeException, ClassNotFoundException, BadPaddingException {
+	private void sendRequestToWS() throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, IOException, IllegalBlockSizeException, ClassNotFoundException, BadPaddingException {
 		Cipher cipher = Cipher.getInstance("AES");
 		cipher.init(Cipher.ENCRYPT_MODE, this.WSClientAESKey);
 		
@@ -108,37 +107,4 @@ public class Client {
 		} while(!req.equals(" "));
 		System.out.println("END");
 	}
-	
-	private void sendRequestToKeychain() throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, IOException, IllegalBlockSizeException, ClassNotFoundException, BadPaddingException {
-		Cipher cipher = Cipher.getInstance("AES");
-		cipher.init(Cipher.ENCRYPT_MODE, this.WSClientAESKey);
-		
-		//identification to the Web Service
-		SealedObject request = new SealedObject(this.ID, cipher);
-		ObjectOutputStream outO = new ObjectOutputStream(this.toWS.getOutputStream());
-		outO.writeObject(this.ID);
-		outO.flush();
-		
-		//msg received from the Web Service
-		ObjectInputStream in = new ObjectInputStream(this.toWS.getInputStream());
-		SealedObject sealedMsg = (SealedObject) in.readObject();
-		cipher.init(Cipher.DECRYPT_MODE, this.WSClientAESKey);
-		String msg = (String) sealedMsg.getObject(cipher);
-		System.out.println(msg);
-		
-		//Messages that the user wants to send to the Web Service
-		cipher.init(Cipher.ENCRYPT_MODE, this.WSClientAESKey);
-		String req="";
-		do {
-			System.out.println("Please enter what you want to send to the Web Service:");
-			Scanner sc = new Scanner(System.in);
-			req = sc.next();
-			request = new SealedObject(req, cipher);
-			outO = new ObjectOutputStream(toWS.getOutputStream());
-			outO.writeObject(request);
-			outO.flush();
-		} while(req!="");
-		System.out.println("end");
-	}
-	
 }
