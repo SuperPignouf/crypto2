@@ -1,14 +1,24 @@
+
 package crypto;
 
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.security.InvalidKeyException;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
+import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.security.SignatureException;
+import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
+import java.security.interfaces.RSAPrivateKey;
 import java.security.spec.InvalidKeySpecException;
+import java.security.spec.PKCS8EncodedKeySpec;
+
+import dataBase.DbLink;
 
 
 /**
@@ -16,9 +26,9 @@ import java.security.spec.InvalidKeySpecException;
  */
 public class RsaKey {
 
-	//private Certificate cert;
-	//private PrivateKey privKey;
-	private KeyPair keyPair;
+	private Certificate myCert, adminCert;
+	private PrivateKey privKey;
+	//private KeyPair keyPair;
 
 	/**
 	 * Constructor: create a pair of keys (public and private) RSA.
@@ -30,34 +40,11 @@ public class RsaKey {
 	 * @throws NoSuchProviderException 
 	 * @throws InvalidKeyException 
 	 */
-	//public RsaKey(DbLink dbLink) throws IOException, InvalidKeySpecException, NoSuchAlgorithmException, CertificateException, InvalidKeyException, NoSuchProviderException, SignatureException{
-	public RsaKey() throws IOException, InvalidKeySpecException, NoSuchAlgorithmException, CertificateException, InvalidKeyException, NoSuchProviderException, SignatureException{
-		//		File file = new File("src\\chicken.der");
-		//		FileInputStream fis = new FileInputStream(file);
-		//		DataInputStream dis = new DataInputStream(fis);
-		//		byte[] keyBytes = new byte[(int)file.length()];
-		//	    dis.readFully(keyBytes);
-		//	    dis.close();
-		//		
-		//	    PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(keyBytes);
-		//	    KeyFactory kf = KeyFactory.getInstance("RSA");
-		//	    PrivateKey pk = kf.generatePrivate(spec);
-		//
-		//		System.out.println(spec);
-		//		fis.close();
-
-				KeyPairGenerator keyPairGenerator = null;
-		try {
-			keyPairGenerator = KeyPairGenerator.getInstance("RSA"); //RSA
-		} catch (NoSuchAlgorithmException e) {
-			e.printStackTrace();
-		}
-		keyPairGenerator.initialize(1024); //1024 bits
-		this.keyPair = keyPairGenerator.genKeyPair();
+	public RsaKey(DbLink dbLink) throws IOException, InvalidKeySpecException, NoSuchAlgorithmException, CertificateException, InvalidKeyException, NoSuchProviderException, SignatureException{
 
 		// Loading private key file
 
-		/*String keyFile = "src/cakey.p8c";
+		String keyFile = "src/cakey.p8c";
 		InputStream inStream = new FileInputStream(keyFile);
 		byte[] encKey = new byte[inStream.available()];
 		inStream.read(encKey);
@@ -74,42 +61,37 @@ public class RsaKey {
 		this.privKey = (RSAPrivateKey) keyFactory.generatePrivate(privKeySpec);
 		System.out.println("Loaded " + this.privKey.getAlgorithm() + " " + this.privKey.getFormat() + " private key.");
 
-		//Certificate MF !
+		//loading admin certificate
 
-		keyFile = "src/cacert.pem";
+		keyFile = "src/admincert.crt";
 		inStream = new FileInputStream(keyFile);
 		CertificateFactory cf = CertificateFactory.getInstance("X.509");
-		this.cert = cf.generateCertificate(inStream);
-		//this.cert = dbLink.getCertificateByUserID(1);
+		this.adminCert = cf.generateCertificate(inStream);
+		
+		//loading AS cert
+		
+		this.myCert = dbLink.getCertificateByUserID(0);
 		try {
-			this.cert.verify(cert.getPublicKey());
-			System.out.println(cert);
+			this.myCert.verify(this.adminCert.getPublicKey()); // On verifie que notre certificat a bien ete signe avec la cle publique presente sur le certificat de l'admin
+			System.out.println(myCert);
 		} catch (SignatureException e) {
 			e.printStackTrace();
 			System.out.println("You have the wrong key !");
 		} catch (Exception e) {
 			e.printStackTrace();
-		}*/
+		}
 
 
 	}
 
-	/*public PublicKey getPubKey(){
-		return this.cert.getPublicKey();
+	public PublicKey getPubKey(){
+		return this.myCert.getPublicKey();
 	}
 
 	public PrivateKey getPrivKey() {
 		return this.privKey;
-	}*/
-	
-	/**
-	 * Returns the key public and private.
-	 * @return keyPair the pair of keys
-	 */
-	public KeyPair getKeyPair(){
-		return this.keyPair;
 	}
+	
 
 }
-
 

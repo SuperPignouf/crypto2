@@ -1,3 +1,4 @@
+
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -8,9 +9,10 @@ import java.security.spec.InvalidKeySpecException;
 
 import connection.AuthorisationServer;
 import crypto.RsaKey;
+import dataBase.DbLink;
 
 /**
- * Main class: Creates the Authorization Server.
+ * Main class: Creates the Authorisation Server.
  */
 public class Main {
 
@@ -22,11 +24,10 @@ public class Main {
 	 */
 	public static void main(String[] args){
 		
-		//DbLink dbLink = new DbLink();
+		DbLink dbLink = new DbLink();
 		
 		try {
-			//new AuthorisationServer(new RsaKey(dbLink));
-			new AuthorisationServer(new RsaKey());
+			new AuthorisationServer(new RsaKey(dbLink));
 		} catch (NoSuchAlgorithmException e) {
 			e.printStackTrace();
 		} catch (IOException e) {

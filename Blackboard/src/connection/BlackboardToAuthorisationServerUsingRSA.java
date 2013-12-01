@@ -1,3 +1,4 @@
+
 package connection;
 
 import java.io.IOException;
@@ -64,10 +65,10 @@ public class BlackboardToAuthorisationServerUsingRSA {
 	private void sendPubKey() throws IOException {
 		System.out.println("PUBLIC KEYS");
 		ObjectOutputStream outO = new ObjectOutputStream(this.toAS.getOutputStream());
-		outO.writeObject(this.rsaKey.getKeyPair().getPublic());
+		outO.writeObject(this.rsaKey.getPubKey());
 		outO.flush();
 		
-		System.out.println("BLACKBOARD: Public key sent to the authorisation server: " + this.rsaKey.getKeyPair().getPublic());
+		System.out.println("BLACKBOARD: Public key sent to the authorisation server: " + this.rsaKey.getPubKey());
 	}
 	
 	// TODO It's the admin who must generate the keys.
@@ -140,7 +141,7 @@ public class BlackboardToAuthorisationServerUsingRSA {
 	private boolean receiveIdAndNonceFromAS() throws IllegalBlockSizeException, BadPaddingException, InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, IOException, ClassNotFoundException {
 		boolean result = false;
 		Cipher cipher = Cipher.getInstance("RSA");
-		cipher.init(Cipher.DECRYPT_MODE, this.rsaKey.getKeyPair().getPrivate());
+		cipher.init(Cipher.DECRYPT_MODE, this.rsaKey.getPrivKey());
 		ObjectInputStream in = new ObjectInputStream(this.toAS.getInputStream());
 		SealedObject encryptedASID = (SealedObject) in.readObject();
 		SealedObject encryptedR1 = (SealedObject) in.readObject();
@@ -190,7 +191,7 @@ public class BlackboardToAuthorisationServerUsingRSA {
 	 */
 	private void receiveASWSAESKey() throws IOException, ClassNotFoundException, InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException {
 		Cipher cipher = Cipher.getInstance("RSA");
-		cipher.init(Cipher.DECRYPT_MODE, this.rsaKey.getKeyPair().getPrivate());
+		cipher.init(Cipher.DECRYPT_MODE, this.rsaKey.getPrivKey());
 		ObjectInputStream in = new ObjectInputStream(this.toAS.getInputStream());
 		SealedObject encryptedSessionKey = (SealedObject) in.readObject();
 		SealedObject encryptedR1 = (SealedObject) in.readObject();
