@@ -1,3 +1,4 @@
+
 package connection;
 
 import java.io.IOException;
@@ -24,6 +25,7 @@ import crypto.RsaKey;
  */
 public class BlackboardToAuthorisationServerUsingRSA {
 
+	private BlackboardWebService blackboard;
 	private Socket toAS;
 	private RsaKey rsaKey;
 	private PublicKey ASPubKey;
@@ -43,7 +45,8 @@ public class BlackboardToAuthorisationServerUsingRSA {
 	 * @throws IllegalBlockSizeException
 	 * @throws BadPaddingException
 	 */
-	public 	BlackboardToAuthorisationServerUsingRSA(int ID, RsaKey rsaKey) throws IOException, ClassNotFoundException, InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException{
+	public 	BlackboardToAuthorisationServerUsingRSA(BlackboardWebService blackboard, int ID, RsaKey rsaKey) throws IOException, ClassNotFoundException, InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException{
+		this.blackboard = blackboard;
 		this.ID = ID;
 		this.rsaKey = rsaKey;
 		initConnection();
@@ -198,7 +201,8 @@ public class BlackboardToAuthorisationServerUsingRSA {
 			byte[] SessionKey = new byte[32];
 			SessionKey = (byte[]) encryptedSessionKey.getObject(cipher);
 			this.ASBlackboardAESKey = new SecretKeySpec(SessionKey, 0, 32, "AES");
-			System.out.println("BLACHBOARD : received AS-Blackboard AES session key " + this.ASBlackboardAESKey);
+			this.blackboard.setASBlackboardAES(ASBlackboardAESKey);
+			System.out.println("BLACKBOARD : received AS-Blackboard AES session key " + this.ASBlackboardAESKey);
 		}
 		else
 			System.out.println("BLACKBOARD : error: wrong r1, AS-Blackboard AES session key refused");

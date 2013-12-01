@@ -1,14 +1,18 @@
+
 package connection;
 
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Scanner;
 
 import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SealedObject;
 import javax.crypto.SecretKey;
 
 import crypto.RsaKey;
@@ -21,13 +25,18 @@ public class Client {
 
 	private SecretKey WSClientAESKey; // The AS-WS AES session key.
 	private int WSID;
-	private Socket toBB, toKC;
+	private Socket toWS;
 	
 	public Client(RsaKey rsaKey) throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, IOException, ClassNotFoundException {
 		this.WSID = chooseService();
-		ClientToASCommunicationUsingRSA TAS = new ClientToASCommunicationUsingRSA(this.WSID, rsaKey);
+		ClientToAuthorisationServerUsingRSA TAS = new ClientToAuthorisationServerUsingRSA(this.WSID, rsaKey);
 		this.WSClientAESKey = TAS.getWSClientAESKey(); // Get the WS-Client AES session key from the AS.
 		
+		/*if (this.WSID == 1)
+			initConnectionWithBlackboard();
+		else if (this.WSID == 2)
+			initConnectionWithKeychain();
+		sendRequestToWS();*/
 	}
 	
 	/**
@@ -49,15 +58,31 @@ public class Client {
 	 * Opens a connection to the first Web Service (virtual blackboard, port 4224).
 	 * @throws IOException
 	 */
-	private void initConnectionWithWS1() throws IOException{
-		this.toBB = new Socket("localhost", 4224);
+	private void initConnectionWithBlackboard() throws IOException{
+		this.toWS = new Socket("localhost", 4224);
 	}
 	
 	/**
 	 * Opens a connection to the second Web Service (virtual keychain server, port 4224).
 	 * @throws IOException
 	 */
-	private void initConnectionWithWS2() throws IOException{
-		this.toKC = new Socket("localhost", 4242);
+	private void initConnectionWithKeychain() throws IOException{
+		this.toWS = new Socket("localhost", 4242);
+	}
+	
+	private void sendRequestToWS() throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, IOException, IllegalBlockSizeException {
+		Cipher cipher = Cipher.getInstance("AES");
+		cipher.init(Cipher.ENCRYPT_MODE, this.WSClientAESKey);
+		String req="";
+		do {
+			System.out.println("Please enter what you want to send to the Web Service:");
+			Scanner sc = new Scanner(System.in);
+			req = sc.next();
+			SealedObject request = new SealedObject(req, cipher);
+			ObjectOutputStream outO = new ObjectOutputStream(toWS.getOutputStream());
+			outO.writeObject(request);
+			outO.flush();
+		} while(req!="");
+		System.out.println("end");
 	}
 }

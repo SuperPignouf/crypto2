@@ -1,3 +1,4 @@
+
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -14,7 +15,7 @@ import crypto.RsaKey;
 public class Main {
 	public static void main(String[] args) {
 		try {
-			BlackboardWebService blackboard = new BlackboardWebService(new RsaKey());
+			new BlackboardWebService(new RsaKey());
 		} catch (InvalidKeyException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

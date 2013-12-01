@@ -1,3 +1,4 @@
+
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -26,9 +27,7 @@ public class Main {
 		DbLink dbLink = new DbLink();
 		
 		try {
-			@SuppressWarnings("unused")
-			AuthorisationServer AS = new AuthorisationServer(new RsaKey(dbLink));
-			//AuthorisationServer AS = new AuthorisationServer(new RsaKey());
+			new AuthorisationServer(new RsaKey(dbLink));
 		} catch (NoSuchAlgorithmException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

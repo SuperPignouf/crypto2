@@ -1,3 +1,4 @@
+
 package crypto;
 
 import java.io.FileInputStream;
@@ -42,29 +43,6 @@ public class RsaKey {
 	 * @throws InvalidKeyException 
 	 */
 	public RsaKey(DbLink dbLink) throws IOException, InvalidKeySpecException, NoSuchAlgorithmException, CertificateException, InvalidKeyException, NoSuchProviderException, SignatureException{
-	//public RsaKey() throws IOException, InvalidKeySpecException, NoSuchAlgorithmException, CertificateException, InvalidKeyException, NoSuchProviderException, SignatureException{
-		//		File file = new File("src\\chicken.der");
-		//		FileInputStream fis = new FileInputStream(file);
-		//		DataInputStream dis = new DataInputStream(fis);
-		//		byte[] keyBytes = new byte[(int)file.length()];
-		//	    dis.readFully(keyBytes);
-		//	    dis.close();
-		//		
-		//	    PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(keyBytes);
-		//	    KeyFactory kf = KeyFactory.getInstance("RSA");
-		//	    PrivateKey pk = kf.generatePrivate(spec);
-		//
-		//		System.out.println(spec);
-		//		fis.close();
-
-				/*KeyPairGenerator keyPairGenerator = null;
-		try {
-			keyPairGenerator = KeyPairGenerator.getInstance("RSA"); //RSA
-		} catch (NoSuchAlgorithmException e) {
-			e.printStackTrace();
-		}
-		keyPairGenerator.initialize(1024); //1024 bits
-		this.keyPair = keyPairGenerator.genKeyPair();*/
 
 		// Loading private key file
 
@@ -116,14 +94,6 @@ public class RsaKey {
 		return this.privKey;
 	}
 	
-	/**
-	 * Returns the key public and private.
-	 * @return keyPair the pair of keys
-	 */
-	/*public KeyPair getKeyPair(){
-		return this.keyPair;
-	}*/
 
 }
-
 

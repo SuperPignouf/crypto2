@@ -1,3 +1,5 @@
+
+
 package connection;
 
 import java.io.IOException;
@@ -17,12 +19,16 @@ import javax.crypto.SecretKey;
 import crypto.RsaKey;
 
 /**
- * The "main" class of the AS. It creates the Authorisation Server, connects with clients using RSA encryption and finally transmits 
+ * The "main" class of the AS. It creates the Authorization Server, connects with clients using RSA encryption and finally transmits 
  */
 public class AuthorisationServer {
 
+	private int ID = 0;
+	private int cryptoperiod = 7200;
 	private SecretKey ASBlackboardAESKey, ASKeychainAESKey;
 	private ServerSocket myService;
+	private Socket clientSocket = null;
+	private Thread t;
 
 	/**
 	 * Constructor: creates the Authorization Server.
@@ -43,7 +49,10 @@ public class AuthorisationServer {
 	private void acceptConnections(RsaKey rsaKey) {
 		while(true){			
 			try {
-				new RSASecuredService(this.myService.accept(), rsaKey, this).run();
+				this.clientSocket = this.myService.accept();
+				System.out.println("\nAS: Someone wants to connect.");
+				t = new Thread(new RSASecuredService(this, this.clientSocket, rsaKey, this.ID, this.cryptoperiod));
+				t.start();
 			} catch (IOException e) {
 				System.out.println(e);
 			}					    
@@ -76,7 +85,7 @@ public class AuthorisationServer {
 	}
 
 	/**
-	 * Transmits the WS-Client AES "cryptoperiodic" session key to the appropriate WS.
+	 * Transmits the WS-Client AES "cryptoperiodic" session key to the appropriate Web Service.
 	 * @param WSClientAESKey
 	 * @param WSID
 	 * @param clientID
@@ -88,39 +97,29 @@ public class AuthorisationServer {
 	 * @throws IllegalBlockSizeException
 	 */
 	public void transmitWSClientAESKeyToWS(SecretKey WSClientAESKey, int WSID, int clientID) throws UnknownHostException, IOException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException { 
-		Socket toWS;
-		if (WSID == 1){ // If Blackboard.
+		Socket toWS = null;
+		if (WSID == 1) // If Blackboard.
 			toWS = new Socket("localhost", 4224);
-			Cipher cipher = Cipher.getInstance("AES");
-			cipher.init(Cipher.ENCRYPT_MODE, this.ASBlackboardAESKey);
-			SealedObject encryptedBBClientAESKey = new SealedObject(WSClientAESKey.getEncoded(), cipher);
-			ObjectOutputStream outO = new ObjectOutputStream(toWS.getOutputStream());
-			int myID = 0;
-			outO.writeObject(myID);
-			outO.flush();
-			outO.writeObject(encryptedBBClientAESKey);
-			outO.flush();
-			
-			outO.close();
-			toWS.close();
-		}
-		else if (WSID == 2){ // If Keychain.
+		else if (WSID == 2) // If Keychain.
 			toWS = new Socket("localhost", 4242);
-			Cipher cipher = Cipher.getInstance("AES");
-			cipher.init(Cipher.ENCRYPT_MODE, this.ASKeychainAESKey);
-			SealedObject encryptedKCClientKey = new SealedObject(WSClientAESKey.getEncoded(), cipher);
-			ObjectOutputStream outO = new ObjectOutputStream(toWS.getOutputStream());
-			int myID = 0;
-			outO.writeObject(myID);
-			outO.flush();
-			outO.writeObject(encryptedKCClientKey);
-			outO.flush();
-			
-			outO.close();
-			toWS.close();
-		}
 		
-		
+		Cipher cipher = Cipher.getInstance("AES");
+		cipher.init(Cipher.ENCRYPT_MODE, this.ASBlackboardAESKey);
+		SealedObject encryptedClientID = new SealedObject(clientID, cipher);
+		SealedObject encryptedBlackboardClientAESKey = new SealedObject(WSClientAESKey.getEncoded(), cipher);
+		SealedObject encryptedCryptoperiod = new SealedObject(this.cryptoperiod, cipher);
+		ObjectOutputStream outO = new ObjectOutputStream(toWS.getOutputStream());
+		outO.writeObject(this.ID);
+		outO.flush();
+		outO.writeObject(encryptedClientID);
+		outO.flush();
+		outO.writeObject(encryptedBlackboardClientAESKey);
+		outO.flush();
+		outO.writeObject(encryptedCryptoperiod);
+		outO.flush();
+
+		outO.close();
+		toWS.close();
 	}
 
 }

@@ -1,3 +1,4 @@
+
 package connection;
 
 import java.io.IOException;
@@ -24,6 +25,7 @@ import crypto.RsaKey;
  */
 public class KeychainToAuthorisationServerUsingRSA {
 
+	private KeychainWebService keychain;
 	private Socket toAS;
 	private RsaKey rsaKey;
 	private PublicKey ASPubKey;
@@ -43,7 +45,8 @@ public class KeychainToAuthorisationServerUsingRSA {
 	 * @throws IllegalBlockSizeException
 	 * @throws BadPaddingException
 	 */
-	public 	KeychainToAuthorisationServerUsingRSA(int ID, RsaKey rsaKey) throws IOException, ClassNotFoundException, InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException{
+	public 	KeychainToAuthorisationServerUsingRSA(KeychainWebService keychain, int ID, RsaKey rsaKey) throws IOException, ClassNotFoundException, InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException{
+		this.keychain = keychain;
 		this.ID = ID;
 		this.rsaKey = rsaKey;
 		initConnection();
@@ -198,6 +201,7 @@ public class KeychainToAuthorisationServerUsingRSA {
 			byte[] SessionKey = new byte[32];
 			SessionKey = (byte[]) encryptedSessionKey.getObject(cipher);
 			this.ASKeychainAESKey = new SecretKeySpec(SessionKey, 0, 32, "AES");
+			this.keychain.setASKeychainAES(ASKeychainAESKey);
 			System.out.println("KEYCHAIN : received AS-Keychain AES session key: " + this.ASKeychainAESKey);
 		}
 		else
