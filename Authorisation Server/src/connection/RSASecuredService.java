@@ -109,7 +109,7 @@ public class RSASecuredService extends Thread implements Runnable {
 		}
 		else if (this.clientID > 2){ // If User.
 			sendIdAndNoncesToUser();
-			partnerRecognized = (receiveNonceBack() && legitimateUser());
+			partnerRecognized = receiveNonceBack();
 		}
 		
 		// TODO The following lines of code should be moved in another function keysDistribution for example.
@@ -262,11 +262,6 @@ public class RSASecuredService extends Thread implements Runnable {
 		
 		System.out.println("AS: R2 received from the client: " + receivedR2);
 		return result;
-	}
-	
-	private boolean legitimateUser() { // Acces a la bdd + demande eventuelle de mot de passe pour verifier l'identite de l'utilisateur
-		// Cette methode va aller voir dans la base de donnees si le user qui tente la connexion est bien enregistre.
-		return true;
 	}
 	
 	/**
