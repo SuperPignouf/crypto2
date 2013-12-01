@@ -1,5 +1,3 @@
-
-
 package connection;
 
 import java.io.IOException;
@@ -104,8 +102,7 @@ public class AuthorisationServer {
 			System.out.println("AS: Connexion to Blackboard.");
 			cipher = Cipher.getInstance("AES");
 			cipher.init(Cipher.ENCRYPT_MODE, this.ASBlackboardAESKey);
-		}
-		else if (WSID == 2) { // If Keychain.
+		} else if (WSID == 2) { // If Keychain.
 			toWS = new Socket("localhost", 4242);
 			System.out.println("AS: Connexion to Keychain.");
 			cipher = Cipher.getInstance("AES");
@@ -128,5 +125,4 @@ public class AuthorisationServer {
 		outO.close();
 		toWS.close();
 	}
-
 }

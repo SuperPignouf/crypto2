@@ -1,4 +1,3 @@
-
 package crypto;
 
 import java.io.FileInputStream;
@@ -80,8 +79,6 @@ public class RsaKey {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
-
 	}
 
 	public PublicKey getPubKey(){
@@ -91,7 +88,4 @@ public class RsaKey {
 	public PrivateKey getPrivKey() {
 		return this.privKey;
 	}
-	
-
 }
-
