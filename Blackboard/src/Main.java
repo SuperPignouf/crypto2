@@ -10,10 +10,9 @@ import connection.BlackboardWebService;
 import crypto.RsaKey;
 
 public class Main {
-	@SuppressWarnings("unused")
 	public static void main(String[] args) {
 		try {
-			BlackboardWebService blackboard = new BlackboardWebService(new RsaKey());
+			new BlackboardWebService(new RsaKey());
 		} catch (InvalidKeyException e) {
 			e.printStackTrace();
 		} catch (NoSuchAlgorithmException e) {
