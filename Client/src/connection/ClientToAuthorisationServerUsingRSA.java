@@ -44,8 +44,6 @@ public class ClientToAuthorisationServerUsingRSA {
 		this.initConnectionWithAS();
 		this.receiveASCertificate();
 		this.needhamSchroederWithAS();
-		// TODO Need to verify of the verifications associated the Needham-Schroeder protocol succeeded
-		// and that the Client can have access to the asked service.
 		this.receiveWSClientAESKey();
 		closeConnection();
 	}
