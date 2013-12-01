@@ -22,7 +22,7 @@ import crypto.RsaKey;
  */
 public class KeychainWebService {
 	
-	private int ID = 2;
+	private int ID = 2, userID = -1; // Personal ID and ID of the client mentioned by the AS when sending the C-WS.
 	private SecretKey ASKeychainAESKey; // The AS-Keychain AES session key.
 	private ServerSocket myService;
 	private Socket clientSocket = null;
@@ -60,6 +60,14 @@ public class KeychainWebService {
 	private void initSocketConnection() throws IOException {
 		this.myService = new ServerSocket(4225);
 		
+	}
+	
+	public int getUserID() {
+		return this.userID;
+	}
+	
+	public void setUserID(int userID) {
+		this.userID = userID;
 	}
 	
 	public void addIDAES(int ID, int cryptoPeriod, SecretKey AESKey){

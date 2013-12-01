@@ -23,7 +23,7 @@ import crypto.RsaKey;
  */
 public class BlackboardWebService {
 	
-	private int ID = 1;
+	private int ID = 1, userID = -1; // Personal ID and ID of the client mentioned by the AS when sending the C-WS.
 	private SecretKey ASBlackboardAESKey; // The AS-Blackboard AES session key.
 	private ServerSocket myService;
 	private Socket clientSocket = null;
@@ -61,6 +61,14 @@ public class BlackboardWebService {
 	private void initSocketConnection() throws IOException {
 		this.myService = new ServerSocket(4224);
 		
+	}
+	
+	public int getUserID() {
+		return this.userID;
+	}
+	
+	public void setUserID(int userID) {
+		this.userID = userID;
 	}
 	
 	public void addIDAES(int ID, int cryptoPeriod, SecretKey AESKey){
