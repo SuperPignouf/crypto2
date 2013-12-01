@@ -99,7 +99,7 @@ public class BlackboardAESSecuredService extends Thread implements Runnable {
 		userKey = (byte[]) encryptedClientKey.getObject(cipher);
 		this.blackboard.addIDAES((Integer) encryptedUserID.getObject(cipher), (Integer) encryptedCryptoperiod.getObject(cipher), new SecretKeySpec(userKey, 0, 32, "AES")); // L'id de l'user et la cle associee sont stockees dans l'objet serviceServer
 		
-		System.out.println("BLACKBOARD : received user ID : " + this.blackboard.getUserID());
+		System.out.println("BLACKBOARD : received user ID : " + (Integer) encryptedUserID.getObject(cipher));
 		System.out.println("BLACKBOARD : received related session AES key : " + new SecretKeySpec(userKey, 0, 32, "AES"));
 		System.out.println("BLACKBOARD : received cryptoperiod of that key : " + (Integer) encryptedCryptoperiod.getObject(cipher) + "sec");
 	}
