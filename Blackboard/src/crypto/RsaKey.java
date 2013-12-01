@@ -35,7 +35,8 @@ public class RsaKey {
 	 */
 	public RsaKey() throws IOException, NoSuchAlgorithmException, InvalidKeySpecException, CertificateException{
 
-		String keyFile = "src/BBkey.p8c";
+		//String keyFile = "src/BBkey.p8c"; //TODO
+		String keyFile = "BBkey.p8c";
 		InputStream inStream = new FileInputStream(keyFile);
 		byte[] encKey = new byte[inStream.available()];
 		inStream.read(encKey);
@@ -54,21 +55,22 @@ public class RsaKey {
 
 		//loading admin certificate
 
-		keyFile = "src/admincert.crt";
+		//keyFile = "src/admincert.crt"; //TODO
+		keyFile = "admincert.crt";
 		inStream = new FileInputStream(keyFile);
 		CertificateFactory cf = CertificateFactory.getInstance("X.509");
 		this.adminCert = cf.generateCertificate(inStream);
 
 		//loading my certificate
 
-		keyFile = "src/BBcert.crt";
+		//keyFile = "src/BBcert.crt"; //TODO
+		keyFile = "BBcert.crt";
 		inStream = new FileInputStream(keyFile);
 		cf = CertificateFactory.getInstance("X.509");
 		this.myCert = cf.generateCertificate(inStream);
 
 	}
 
-	
 	public PrivateKey getPrivKey(){
 		return this.privKey;
 	}
