@@ -28,10 +28,12 @@ public class KeychainWebService {
 	private Socket clientSocket = null;
 	private Thread t;
 	private ArrayList<IDAES> IDAESList = new ArrayList<IDAES>(); // List of keys allowing to communicate with Clients and ID's of corresponding Clients.
+	DbLink dbLink=null;
 
 	public KeychainWebService(RsaKey rsaKey, DbLink dblink) throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, IOException, ClassNotFoundException {
 		KeychainToAuthorisationServerUsingRSA TAS = new KeychainToAuthorisationServerUsingRSA(this, this.ID, rsaKey);
 		this.ASKeychainAESKey = TAS.getASKeychainAESKey(); // Get the AS-Keychain AES session key from the AS.
+		this.dbLink=dblink;
 		initSocketConnection();
 		acceptConnections(); // On est pret a recevoir des requetes
 	}
@@ -44,7 +46,7 @@ public class KeychainWebService {
 			try {
 				this.clientSocket = this.myService.accept();
 				System.out.println("\nKEYCHAIN: Someone wants to connect.");
-				t = new Thread(new KeychainAESSecuredService(this, this.clientSocket, this.ASKeychainAESKey));
+				t = new Thread(new KeychainAESSecuredService(this, this.clientSocket, this.ASKeychainAESKey, this.dbLink));
 				t.start();
 			}
 			catch (IOException e) {

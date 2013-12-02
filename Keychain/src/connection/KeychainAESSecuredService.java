@@ -6,9 +6,6 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -29,12 +26,13 @@ public class KeychainAESSecuredService extends Thread implements Runnable {
 	private KeychainWebService keychain;
 	private ObjectInputStream in;
 	private ObjectOutputStream outO;
-	private DbLink dbLink;
+	private DbLink dbLink=null;
 
-	public KeychainAESSecuredService(KeychainWebService keychain, Socket accept, SecretKey ASAESKey) {
+	public KeychainAESSecuredService(KeychainWebService keychain, Socket accept, SecretKey ASAESKey, DbLink dblink) {
 		this.clientSocket = accept;
 		this.ASKey = ASAESKey;
 		this.keychain = keychain;
+		this.dbLink=dblink;
 	}
 	
 	/**
@@ -82,8 +80,6 @@ public class KeychainAESSecuredService extends Thread implements Runnable {
 		outO.writeObject(encryptedMsg);
 		outO.flush();
 		
-		//dbLink = new DbLink();
-		
 		System.out.println("\n"+"------- KEYCHAIN -------");
 		cipher.init(Cipher.DECRYPT_MODE, idaes.getAES());
 		while(!msg.equals(" ")) { //TODO add cryptotime
@@ -91,6 +87,7 @@ public class KeychainAESSecuredService extends Thread implements Runnable {
 			SealedObject ClientMsg = (SealedObject) in.readObject();
 			msg = (String) ClientMsg.getObject(cipher);
 			System.out.println(msg);
+			this.dbLink.insertData(this.clientID, "login", msg);
 		}
 		System.out.println("END");
 		
