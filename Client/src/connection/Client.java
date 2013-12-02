@@ -30,8 +30,8 @@ public class Client {
 	private Socket toWS;
 	
 	public Client(RsaKey rsaKey) throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, IOException, ClassNotFoundException {
-		//this.ID = new Scanner(new File("src/ID.txt")).nextInt(); //TODO
-		this.ID = new Scanner(new File("ID.txt")).nextInt();
+		this.ID = new Scanner(new File("src/ID.txt")).nextInt(); //Eclipse
+		//this.ID = new Scanner(new File("ID.txt")).nextInt(); //console
 		this.WSID = chooseService();
 		ClientToAuthorisationServerUsingRSA TAS = new ClientToAuthorisationServerUsingRSA(this.ID, this.WSID, rsaKey);
 		this.WSClientAESKey = TAS.getWSClientAESKey(); // Get the WS-Client AES session key from the AS.
