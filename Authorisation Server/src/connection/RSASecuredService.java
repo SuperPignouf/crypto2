@@ -31,8 +31,8 @@ public class RSASecuredService extends Thread implements Runnable {
 	private Socket clientSocket;
 	private RsaKey rsaKey;
 	private PublicKey clientPubKey;
-	private int ID, clientID, WSID; // AS"s ID, Client's ID and ID of the WS asked by the client (when the Client is a user)
-	private int r1, r2, r3; // TODO r2 = r4 OK ?
+	private int ID, clientID, WSID; // ASs ID, Client's ID and ID of the WS asked by the client (when the Client is a user)
+	private int r1, r2, r3; // r2 plays the role of r4
 	private int cryptoperiod;
 	private SecretKey ASWSAESKey, WSClientAESKey;
 	private DbLink dbLink;
@@ -50,7 +50,7 @@ public class RSASecuredService extends Thread implements Runnable {
 	@Override
 	public void run() {
 		try {
-			sendCertificate();
+			sendCertificate(); // Its validity will be verified by the client
 			needhamSchroeder();
 			closeConnection();
 		} catch (IOException e) {
@@ -74,9 +74,10 @@ public class RSASecuredService extends Thread implements Runnable {
 	
 	private void sendCertificate() throws IOException, CertificateEncodingException {
 		System.out.println("AS CERTIFICATE");
+		
 		ObjectOutputStream outO = new ObjectOutputStream(this.clientSocket.getOutputStream());
 		outO.writeObject(this.rsaKey.getCert());
-		outO.flush();
+		outO.flush(); //Certificate is public, it can be sent plain.
 		
 		System.out.println("AS: Certificate sent to the client: " + this.rsaKey.getCert());
 		
@@ -252,7 +253,6 @@ public class RSASecuredService extends Thread implements Runnable {
 	private boolean receiveNonceBack() throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, IOException, ClassNotFoundException {
 		boolean result = false;
 		Cipher cipher = Cipher.getInstance("RSA");
-		//cipher.init(Cipher.DECRYPT_MODE, this.rsaKey.getPrivKey());
 		cipher.init(Cipher.DECRYPT_MODE, this.rsaKey.getPrivKey());
 
 		ObjectInputStream in = new ObjectInputStream(this.clientSocket.getInputStream());
