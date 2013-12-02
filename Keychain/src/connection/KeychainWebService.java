@@ -80,10 +80,21 @@ public class KeychainWebService {
 		this.userID = userID;
 	}
 	
+	/**
+	 * Add a client's ID, the secret key (AES) shared with this client, and the cryptoperiod.
+	 * @param ID - the client's ID.
+	 * @param cryptoPeriod - the cryptoperiod.
+	 * @param AESKey - the secret key (AES) shared with the client.
+	 */
 	public void addIDAES(int ID, int cryptoPeriod, SecretKey AESKey){
 		this.IDAESList.add(new IDAES(AESKey, ID, cryptoPeriod));
 	}
 	
+	/**
+	 * Remove the client's ID, and the secret key (AES) shared with this client.
+	 * @param ID - the client's ID.
+	 * @param AESKey - the secret key (AES) shared with the client.
+	 */
 	public void removeIDAES(int ID, SecretKey AESKey){
 		IDAES idaes = new IDAES(AESKey, 0, ID) ;
 		for(IDAES i : this.IDAESList){

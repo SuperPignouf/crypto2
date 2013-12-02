@@ -2,7 +2,10 @@ package dataContainers;
 
 import javax.crypto.SecretKey;
 
-public class IDAES { // Structure de donnees utilisee par le service pour retenir les cles de session AES et les id de clients associes
+/**
+ * Data structure used by the web service to store the AES key and the associated client's ID.
+ */
+public class IDAES {
 
 	private SecretKey AES;
 	private int clientID;
