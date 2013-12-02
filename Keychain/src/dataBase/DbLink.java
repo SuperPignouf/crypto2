@@ -2,6 +2,7 @@ package dataBase;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 public class DbLink {
@@ -41,5 +42,17 @@ private Connection con;
 		}
 	}
 	
+	public void insertData(int ID, String login, String password) {
+		PreparedStatement ps = null;
+		try {
+			ps = con.prepareStatement("INSERT INTO Keychain (ClientID, Login, Password) VALUES (?,?,?)");
+			ps.setInt(1, ID);
+			ps.setString(2, login);
+			ps.setString(3, password);
+			ps.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
 	
 }
