@@ -23,8 +23,8 @@ import crypto.RsaKey;
  */
 public class BlackboardWebService {
 	
-	private int ID = 1, userID = -1; // Personal ID and ID of the client mentioned by the AS when sending the C-WS.
-	private SecretKey ASBlackboardAESKey; // The AS-Blackboard AES session key.
+	private int ID = 1, userID = -1;
+	private SecretKey ASBlackboardAESKey;
 	private ServerSocket myService;
 	private Socket clientSocket = null;
 	private Thread t;
@@ -32,9 +32,9 @@ public class BlackboardWebService {
 
 	public BlackboardWebService(RsaKey rsaKey) throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, IOException, ClassNotFoundException {
 		BlackboardToAuthorisationServerUsingRSA TAS = new BlackboardToAuthorisationServerUsingRSA(this, this.ID, rsaKey);
-		this.ASBlackboardAESKey = TAS.getASBlackboardAESKey(); // Get the AS-Blackboard AES session key from the AS.
+		this.ASBlackboardAESKey = TAS.getASBlackboardAESKey();
 		initSocketConnection();
-		acceptConnections(); // On est pret a recevoir des requetes
+		acceptConnections();
 	}
 	
 	/**
