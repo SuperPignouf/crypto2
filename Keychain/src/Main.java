@@ -13,13 +13,21 @@ import connection.KeychainWebService;
 import crypto.RsaKey;
 import dataBase.DbLink;
 
+/**
+ * Main class: Creates the "Keychain" web service.
+ */
 public class Main {
+	
+	/**
+	 * Main: create the keychain web service.
+	 * @param args arguments for the main.
+	 */
 	public static void main(String[] args) {
 		
 		DbLink dbLink = new DbLink();
 		
 		try {
-			new KeychainWebService(new RsaKey(), dblink);
+			new KeychainWebService(new RsaKey(), dbLink);
 		} catch (InvalidKeyException e) {
 			e.printStackTrace();
 		} catch (NoSuchAlgorithmException e) {

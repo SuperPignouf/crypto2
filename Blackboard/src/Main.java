@@ -12,7 +12,15 @@ import javax.crypto.NoSuchPaddingException;
 import connection.BlackboardWebService;
 import crypto.RsaKey;
 
+/**
+ * Main class: Creates the "Blackboard" web service.
+ */
 public class Main {
+	
+	/**
+	 * Main: create the blackboard web service.
+	 * @param args arguments for the main.
+	 */
 	public static void main(String[] args) {
 		try {
 			new BlackboardWebService(new RsaKey());
