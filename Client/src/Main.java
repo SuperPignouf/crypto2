@@ -12,8 +12,15 @@ import javax.crypto.NoSuchPaddingException;
 import connection.Client;
 import crypto.RsaKey;
 
-
+/**
+ * Main class: Creates the client interface.
+ */
 public class Main {
+	
+	/**
+	 * Main: create the client interface.
+	 * @param args arguments for the main.
+	 */
 	public static void main(String[] args){
 		try {
 			new Client(new RsaKey());

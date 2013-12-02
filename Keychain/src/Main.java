@@ -12,7 +12,15 @@ import javax.crypto.NoSuchPaddingException;
 import connection.KeychainWebService;
 import crypto.RsaKey;
 
+/**
+ * Main class: Creates the "Keychain" web service.
+ */
 public class Main {
+	
+	/**
+	 * Main: create the keychain web service.
+	 * @param args arguments for the main.
+	 */
 	public static void main(String[] args) {
 		try {
 			new KeychainWebService(new RsaKey());
