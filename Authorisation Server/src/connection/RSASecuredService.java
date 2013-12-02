@@ -38,7 +38,6 @@ public class RSASecuredService extends Thread implements Runnable {
 	private DbLink dbLink;
 	
 	public RSASecuredService(AuthorisationServer AS, Socket clientSocket, RsaKey rsaKey, int ID, int cryptoperiod, DbLink dbLink) {
-
 		this.AS = AS;
 		this.ID = ID;
 		this.cryptoperiod = cryptoperiod;
@@ -81,7 +80,6 @@ public class RSASecuredService extends Thread implements Runnable {
 		System.out.println("AS: Certificate sent to the client: " + this.rsaKey.getCert());
 		
 	}
-	
 
 	/**
 	 * Launches a Needham-Schroeder protocol between the Client (WS or user) and the AS. 
@@ -104,8 +102,7 @@ public class RSASecuredService extends Thread implements Runnable {
 		if (this.clientID == 1 || this.clientID == 2){ // If WS.
 			sendIdAndNoncesToService();
 			partnerRecognized = receiveNonceBack();
-		}
-		else if (this.clientID > 2){ // If User.
+		} else if (this.clientID > 2){ // If User.
 			sendIdAndNoncesToUser();
 			partnerRecognized = receiveNonceBack();
 		}
@@ -117,15 +114,13 @@ public class RSASecuredService extends Thread implements Runnable {
 			System.out.println("AS: Distribution of the symmetric key AS-WS to the blackboard...");
 			createAndSendASWSAESKeyToService();
 			this.AS.setASBlackboardAESKey(this.ASWSAESKey); // The AS-WS AES Key is memorized by the AS.
-		}
-		else if(this.clientID == 2 && partnerRecognized){ // If the Client is the Keychain.
+		} else if(this.clientID == 2 && partnerRecognized){ // If the Client is the Keychain.
 			System.out.println("AS: KeyChain fully authentified.");
 			System.out.println("\nAES:");
 			System.out.println("AS: Distribution of the symmetric key AS-WS to the keychain...");
 			createAndSendASWSAESKeyToService();
 			this.AS.setASKeychainAESKey(this.ASWSAESKey); // The AS-WS AES Key is memorized by the AS.
-		}
-		else if(this.clientID > 2 && partnerRecognized){ // If the Client is a user.
+		} else if(this.clientID > 2 && partnerRecognized){ // If the Client is a user.
 			System.out.println("AS: User fully authentified.");
 			System.out.println("\nAES:");
 			System.out.println("AS: Distribution of the symmetric key...");
@@ -163,8 +158,7 @@ public class RSASecuredService extends Thread implements Runnable {
 			this.r1 = (Integer) encryptedR1.getObject(cipher);
 			System.out.println("AS: ID received from the client (WS): " + this.clientID);
 			System.out.println("AS: R1 received from the client: " + this.r1);
-		}
-		else if(this.clientID > 2){ // When the Client is a user.
+		} else if(this.clientID > 2){ // When the Client is a user.
 			this.WSID = (Integer) in.readObject();
 			//SealedObject encryptedClientID = (SealedObject) in.readObject();
 			//SealedObject encryptedWSID = (SealedObject) in.readObject();
@@ -252,7 +246,6 @@ public class RSASecuredService extends Thread implements Runnable {
 	private boolean receiveNonceBack() throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, IOException, ClassNotFoundException {
 		boolean result = false;
 		Cipher cipher = Cipher.getInstance("RSA");
-		//cipher.init(Cipher.DECRYPT_MODE, this.rsaKey.getPrivKey());
 		cipher.init(Cipher.DECRYPT_MODE, this.rsaKey.getPrivKey());
 
 		ObjectInputStream in = new ObjectInputStream(this.clientSocket.getInputStream());
@@ -328,7 +321,6 @@ public class RSASecuredService extends Thread implements Runnable {
 		outO.flush();
 
 		System.out.println("AS: User AES key sent: " + this.WSClientAESKey);
-		
 	}
 
 	/**
