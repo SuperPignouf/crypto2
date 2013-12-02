@@ -81,14 +81,26 @@ public class RsaKey {
 		}
 	}
 
+	/**
+	 * Gets the public key.
+	 * @return the public key.
+	 */
 	public PublicKey getPubKey(){
 		return this.myCert.getPublicKey();
 	}
 
+	/**
+	 * Gets the private key.
+	 * @return the private key.
+	 */
 	public PrivateKey getPrivKey() {
 		return this.privKey;
 	}
 	
+	/**
+	 * Gets the certificate.
+	 * @return the certificate.
+	 */
 	public Certificate getCert(){
 		return this.myCert;
 	}

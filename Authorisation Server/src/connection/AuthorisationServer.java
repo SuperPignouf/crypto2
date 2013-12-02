@@ -33,6 +33,7 @@ public class AuthorisationServer {
 	/**
 	 * Constructor: creates the Authorization Server.
 	 * @param rsaKey - The pair of keys (public and private) RSA.
+	 * @Param dbLink - Link with the Database.
 	 * @throws IOException
 	 */
 	public AuthorisationServer(RsaKey rsaKey, DbLink dbLink) throws IOException{
