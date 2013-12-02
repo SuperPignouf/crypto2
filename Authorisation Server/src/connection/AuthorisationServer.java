@@ -22,13 +22,13 @@ import dataBase.DbLink;
  */
 public class AuthorisationServer {
 
-	private int ID = 0;
-	private int cryptoperiod = 7200;
+	private int ID = 0; // My id
+	private int cryptoperiod = 7200; //Cryptoperiod of generated AES keys
 	private SecretKey ASBlackboardAESKey, ASKeychainAESKey;
 	private ServerSocket myService;
 	private Socket clientSocket = null;
 	private Thread t;
-	private DbLink dbLink;
+	private DbLink dbLink; // Link to the database
 
 	/**
 	 * Constructor: creates the Authorization Server.
@@ -126,6 +126,8 @@ public class AuthorisationServer {
 		outO.writeObject(encryptedCryptoperiod);
 		outO.flush();
 
+		//Todo: add a timer to replace the session keys at the end of the cryptoperiod.
+		
 		outO.close();
 		toWS.close();
 	}
