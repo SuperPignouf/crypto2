@@ -74,7 +74,7 @@ public class KeychainWebService {
 	
 	/**
 	 * Sets the user's ID.
-	 * @param userID
+	 * @param userID - the user's ID.
 	 */
 	public void setUserID(int userID) {
 		this.userID = userID;
@@ -91,6 +91,10 @@ public class KeychainWebService {
 		}
 	}
 
+	/**
+	 * Sets the key AES which is used for the communication between this web service and the AS.
+	 * @param ASBlackboardAESKey - the key
+	 */
 	public void setASKeychainAES(SecretKey ASKeychainAESKey) {
 		this.ASKeychainAESKey = ASKeychainAESKey;
 	}
