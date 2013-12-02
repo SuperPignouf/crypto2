@@ -200,9 +200,9 @@ public class RSASecuredService extends Thread implements Runnable {
 		outO.writeObject(encryptedR2);
 		outO.flush();
 		
-		System.out.println("AS: ID sent to the blackboard: " + this.ID);
-		System.out.println("AS: R1 sent to the blackboard: " + this.r1);
-		System.out.println("AS: R2 sent to the blackboard: " + this.r2);
+		System.out.println("AS: ID sent to the web service: " + this.ID);
+		System.out.println("AS: R1 sent to the web service: " + this.r1);
+		System.out.println("AS: R2 sent to the web service: " + this.r2);
 	}
 	
 	/**
