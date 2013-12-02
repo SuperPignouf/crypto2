@@ -12,12 +12,17 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+/**
+ * Class to connect to the Database and get the users certificate.
+ */
 public class DbLink {
 
 	private Connection con;
 	
+	/**
+	 * Connects to the Database. Use JDBC.
+	 */
 	public DbLink(){
-
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
 		} catch (ClassNotFoundException e) {
@@ -27,7 +32,6 @@ public class DbLink {
 		}
 
 		System.out.println("MySQL JDBC Driver Registered!");
-
 		try {
 			String OS = System.getProperty("os.name").toLowerCase();
 			if(OS.contains("mac")) {
@@ -35,7 +39,6 @@ public class DbLink {
 			} else { //linux or windows
 				this.con = DriverManager.getConnection("jdbc:mysql://localhost/crypto2","root", "");
 			}
-
 		} catch (SQLException e) {
 			System.out.println("Connection Failed! Check output console");
 			e.printStackTrace();
@@ -49,7 +52,13 @@ public class DbLink {
 		}
 	}
 
-
+	/**
+	 * Gets the certificate by user's ID.
+	 * @param ID - the user's ID.
+	 * @return result - Certificate.
+	 * @throws NoSuchAlgorithmException
+	 * @throws CertificateException
+	 */
 	public Certificate getCertificateByUserID(int ID) throws NoSuchAlgorithmException, CertificateException{
 		Certificate result = null;
 		PreparedStatement ps = null;

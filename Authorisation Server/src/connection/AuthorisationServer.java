@@ -33,6 +33,7 @@ public class AuthorisationServer {
 	/**
 	 * Constructor: creates the Authorization Server.
 	 * @param rsaKey - The pair of keys (public and private) RSA.
+	 * @Param dbLink - Link with the Database.
 	 * @throws IOException
 	 */
 	public AuthorisationServer(RsaKey rsaKey, DbLink dbLink) throws IOException{
@@ -106,7 +107,7 @@ public class AuthorisationServer {
 			cipher = Cipher.getInstance("AES");
 			cipher.init(Cipher.ENCRYPT_MODE, this.ASBlackboardAESKey);
 		} else if (WSID == 2) { // If Keychain.
-			toWS = new Socket("localhost", 4242);
+			toWS = new Socket("localhost", 4225);
 			System.out.println("AS: Connexion to Keychain.");
 			cipher = Cipher.getInstance("AES");
 			cipher.init(Cipher.ENCRYPT_MODE, this.ASKeychainAESKey);

@@ -19,7 +19,7 @@ import dataContainers.IDAES;
 
 public class BlackboardAESSecuredService extends Thread implements Runnable {
 
-	private int ID, clientID; // personal ID, any client's ID (AS ou user).
+	private int clientID; // personal ID, any client's ID (AS ou user).
 	private Socket clientSocket;
 	private SecretKey ASKey; // La cle de session AES permettant de communiquer avec l'AS
 	private BlackboardWebService blackboard;
@@ -27,7 +27,6 @@ public class BlackboardAESSecuredService extends Thread implements Runnable {
 	private ObjectOutputStream outO;
 
 	public BlackboardAESSecuredService(BlackboardWebService blackboard, Socket accept, SecretKey ASAESKey) {
-		this.ID = 1;
 		this.clientSocket = accept;
 		this.ASKey = ASAESKey;
 		this.blackboard = blackboard;
@@ -78,13 +77,15 @@ public class BlackboardAESSecuredService extends Thread implements Runnable {
 		this.outO.writeObject(encryptedMsg);
 		this.outO.flush();
 		
-		while(msg!="") { //TODO add cryptotime
+		System.out.println("\n"+"------- BLACKBOARD -------");
+		while(!msg.equals(" ")) { //TODO add cryptotime
 			cipher.init(Cipher.DECRYPT_MODE, idaes.getAES());
 			this.in = new ObjectInputStream(this.clientSocket.getInputStream());
 			SealedObject ClientMsg = (SealedObject) in.readObject();
 			msg = (String) ClientMsg.getObject(cipher);
 			System.out.println(msg);
 		}
+		System.out.println("END");
 	}
 
 	private void receiveUserIDAndBlackboardUserKey() throws IOException, ClassNotFoundException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
@@ -99,7 +100,7 @@ public class BlackboardAESSecuredService extends Thread implements Runnable {
 		userKey = (byte[]) encryptedClientKey.getObject(cipher);
 		this.blackboard.addIDAES((Integer) encryptedUserID.getObject(cipher), (Integer) encryptedCryptoperiod.getObject(cipher), new SecretKeySpec(userKey, 0, 32, "AES")); // L'id de l'user et la cle associee sont stockees dans l'objet serviceServer
 		
-		System.out.println("BLACKBOARD : received user ID : " + this.blackboard.getUserID());
+		System.out.println("BLACKBOARD : received user ID : " + (Integer) encryptedUserID.getObject(cipher));
 		System.out.println("BLACKBOARD : received related session AES key : " + new SecretKeySpec(userKey, 0, 32, "AES"));
 		System.out.println("BLACKBOARD : received cryptoperiod of that key : " + (Integer) encryptedCryptoperiod.getObject(cipher) + "sec");
 	}

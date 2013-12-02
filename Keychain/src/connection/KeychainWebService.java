@@ -1,4 +1,3 @@
-
 package connection;
 
 import java.io.IOException;
@@ -13,6 +12,7 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 
+import dataBase.DbLink;
 import dataContainers.IDAES;
 import crypto.RsaKey;
 
@@ -29,7 +29,7 @@ public class KeychainWebService {
 	private Thread t;
 	private ArrayList<IDAES> IDAESList = new ArrayList<IDAES>(); // List of keys allowing to communicate with Clients and ID's of corresponding Clients.
 
-	public KeychainWebService(RsaKey rsaKey) throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, IOException, ClassNotFoundException {
+	public KeychainWebService(RsaKey rsaKey, DbLink dblink) throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, IOException, ClassNotFoundException {
 		KeychainToAuthorisationServerUsingRSA TAS = new KeychainToAuthorisationServerUsingRSA(this, this.ID, rsaKey);
 		this.ASKeychainAESKey = TAS.getASKeychainAESKey(); // Get the AS-Keychain AES session key from the AS.
 		initSocketConnection();
@@ -71,7 +71,7 @@ public class KeychainWebService {
 	}
 	
 	public void addIDAES(int ID, int cryptoPeriod, SecretKey AESKey){
-		this.IDAESList.add(new IDAES(AESKey, cryptoPeriod, ID));
+		this.IDAESList.add(new IDAES(AESKey, ID, cryptoPeriod));
 	}
 	
 	public void removeIDAES(int ID, SecretKey AESKey){

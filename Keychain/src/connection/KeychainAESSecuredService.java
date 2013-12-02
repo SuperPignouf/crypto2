@@ -6,6 +6,10 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -19,7 +23,7 @@ import dataContainers.IDAES;
 
 public class KeychainAESSecuredService extends Thread implements Runnable {
 
-	private int ID, clientID; // personal ID, any client's ID (AS ou user).
+	private int clientID; // personal ID, any client's ID (AS ou user).
 	private Socket clientSocket;
 	private SecretKey ASKey; // La cle de session AES permettant de communiquer avec l'AS
 	private KeychainWebService keychain;
@@ -27,7 +31,6 @@ public class KeychainAESSecuredService extends Thread implements Runnable {
 	private ObjectOutputStream outO;
 
 	public KeychainAESSecuredService(KeychainWebService keychain, Socket accept, SecretKey ASAESKey) {
-		this.ID = 1;
 		this.clientSocket = accept;
 		this.ASKey = ASAESKey;
 		this.keychain = keychain;
@@ -68,7 +71,7 @@ public class KeychainAESSecuredService extends Thread implements Runnable {
 		
 	}
 	
-	private void runService(IDAES idaes) throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, IOException, IllegalBlockSizeException{
+	private void runService(IDAES idaes) throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, IOException, IllegalBlockSizeException, BadPaddingException, ClassNotFoundException{
 		Cipher cipher = Cipher.getInstance("AES");
 		cipher.init(Cipher.ENCRYPT_MODE, idaes.getAES());
 		//ObjectOutputStream outO = new ObjectOutputStream(this.clientSocket.getOutputStream());
@@ -77,6 +80,29 @@ public class KeychainAESSecuredService extends Thread implements Runnable {
 		SealedObject encryptedMsg = new SealedObject (msg, cipher);
 		outO.writeObject(encryptedMsg);
 		outO.flush();
+		
+		Class.forName("com.mysql.jdbc.Driver");
+		Connection con=null;
+		try {
+			String OS = System.getProperty("os.name").toLowerCase();
+			if(OS.contains("mac")) {
+				con = DriverManager.getConnection("jdbc:mysql://localhost:8889/keychainDB","root", "root");
+			} else { //linux or windows
+			con = DriverManager.getConnection("jdbc:mysql://localhost/keychainDB","root", "");
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		System.out.println("\n"+"------- KEYCHAIN -------");
+		while(!msg.equals(" ")) { //TODO add cryptotime
+			cipher.init(Cipher.DECRYPT_MODE, idaes.getAES());
+			this.in = new ObjectInputStream(this.clientSocket.getInputStream());
+			SealedObject ClientMsg = (SealedObject) in.readObject();
+			msg = (String) ClientMsg.getObject(cipher);
+			System.out.println(msg);
+		}
+		System.out.println("END");
 		
 	}
 
