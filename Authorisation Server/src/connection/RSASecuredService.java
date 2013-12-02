@@ -158,8 +158,7 @@ public class RSASecuredService extends Thread implements Runnable {
 			this.r1 = (Integer) encryptedR1.getObject(cipher);
 			System.out.println("AS: ID received from the client (WS): " + this.clientID);
 			System.out.println("AS: R1 received from the client: " + this.r1);
-		}
-		else if(this.clientID > 2){ // When the Client is a user.
+		} else if(this.clientID > 2){ // When the Client is a user.
 			this.WSID = (Integer) in.readObject();
 			//SealedObject encryptedClientID = (SealedObject) in.readObject();
 			//SealedObject encryptedWSID = (SealedObject) in.readObject();
@@ -247,7 +246,6 @@ public class RSASecuredService extends Thread implements Runnable {
 	private boolean receiveNonceBack() throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, IOException, ClassNotFoundException {
 		boolean result = false;
 		Cipher cipher = Cipher.getInstance("RSA");
-		//cipher.init(Cipher.DECRYPT_MODE, this.rsaKey.getPrivKey());
 		cipher.init(Cipher.DECRYPT_MODE, this.rsaKey.getPrivKey());
 
 		ObjectInputStream in = new ObjectInputStream(this.clientSocket.getInputStream());
@@ -323,7 +321,6 @@ public class RSASecuredService extends Thread implements Runnable {
 		outO.flush();
 
 		System.out.println("AS: User AES key sent: " + this.WSClientAESKey);
-		
 	}
 
 	/**
