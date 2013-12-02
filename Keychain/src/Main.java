@@ -11,11 +11,15 @@ import javax.crypto.NoSuchPaddingException;
 
 import connection.KeychainWebService;
 import crypto.RsaKey;
+import dataBase.DbLink;
 
 public class Main {
 	public static void main(String[] args) {
+		
+		DbLink dbLink = new DbLink();
+		
 		try {
-			new KeychainWebService(new RsaKey());
+			new KeychainWebService(new RsaKey(), dblink);
 		} catch (InvalidKeyException e) {
 			e.printStackTrace();
 		} catch (NoSuchAlgorithmException e) {

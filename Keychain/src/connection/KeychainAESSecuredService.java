@@ -86,9 +86,9 @@ public class KeychainAESSecuredService extends Thread implements Runnable {
 		try {
 			String OS = System.getProperty("os.name").toLowerCase();
 			if(OS.contains("mac")) {
-				con = DriverManager.getConnection("jdbc:mysql://localhost:8889/crypto2","root", "root");
+				con = DriverManager.getConnection("jdbc:mysql://localhost:8889/keychainDB","root", "root");
 			} else { //linux or windows
-			con = DriverManager.getConnection("jdbc:mysql://localhost/crypto2","root", "");
+			con = DriverManager.getConnection("jdbc:mysql://localhost/keychainDB","root", "");
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -101,14 +101,6 @@ public class KeychainAESSecuredService extends Thread implements Runnable {
 			SealedObject ClientMsg = (SealedObject) in.readObject();
 			msg = (String) ClientMsg.getObject(cipher);
 			System.out.println(msg);
-			Statement stm=null;
-			try {
-				stm = con.createStatement();
-				stm.execute("INSERT...");
-			    stm=null;
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
 		}
 		System.out.println("END");
 		
