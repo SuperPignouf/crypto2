@@ -9,21 +9,23 @@ function redirection($url) {
 }
 ?>
 
-<?php
+<?
+
 if (!empty($_POST['ID'])) {
+	
 	try {
 		$bdd = new PDO('mysql:host=localhost;dbname=crypto2', 'root', '', array(PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION));
 	} catch(Exception $e) {
-		die('Error : ' . $e -> getMessage());
-		echo 'Something went wrong...';
+		echo "Connection à MySQL impossible : ", $e->getMessage();
+		die();
 	}
 } else {
-	header('Location : delete.php');
+	redirection('delete.php');
 	exit();
 }
 $bdd -> exec("SET CHARACTER SET utf8");
 
-$response = $bdd -> query('Delete from Certificates where ID = ' . htmlspecialchars($_POST['ID']));
+$response = $bdd -> query('Delete from certificates where ID = ' . htmlspecialchars($_POST['ID']));
 
 redirection('index.php');
 

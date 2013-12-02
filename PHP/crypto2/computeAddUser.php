@@ -9,26 +9,30 @@ function redirection($url) {
 }
 ?>
 
-<?php
+<?
+	
 if (!empty($_POST['ID']) AND !empty($_POST['Certificate'])) {
+
 	try {
 		$bdd = new PDO('mysql:host=localhost;dbname=crypto2', 'root', '', array(PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION));
 	} catch(Exception $e) {
-		die('Error : ' . $e -> getMessage());
-		echo 'Something went wrong...';
+		echo "Connection à MySQL impossible : ", $e->getMessage();
+		die();
 	}
 } else {
-	header('Location : add.php');
+	redirection('add.php');
 	exit();
 }
 $bdd -> exec("SET CHARACTER SET utf8");
 
-$exists = $bdd -> query('Select * from Certificates where ID = ' . htmlspecialchars($_POST['ID']));
+
+
+$exists = $bdd -> query('Select * from certificates where ID = ' . htmlspecialchars($_POST['ID']));
 if ($exists -> fetch()) {
-	$response = $bdd -> query('update Certificates set Certificate = "' . htmlspecialchars($_POST['Certificate']) . '" where ID = ' . htmlspecialchars($_POST['ID']));
+	$response = $bdd -> query('update certificates set Certificate = "' . htmlspecialchars($_POST['Certificate']) . '" where ID = ' . htmlspecialchars($_POST['ID']));
 }
 
-else $response = $bdd -> query('Insert into Certificates (ID, Certificate) values(' . htmlspecialchars($_POST['ID']) . ', "' . htmlspecialchars($_POST['Certificate']) . '")');
+else $response = $bdd -> query('Insert into certificates (ID, Certificate) values(' . htmlspecialchars($_POST['ID']) . ', "' . htmlspecialchars($_POST['Certificate']) . '")');
 
 redirection('index.php');
 
