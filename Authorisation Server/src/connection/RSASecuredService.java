@@ -311,7 +311,7 @@ public class RSASecuredService extends Thread implements Runnable {
 		this.WSClientAESKey = keyGen.generateKey();
 		
 		this.AS.transmitWSClientAESKeyToWS(this.WSClientAESKey, this.WSID, this.clientID);
-		sleep(3000);
+		sleep(1000);
 		Cipher cipher = Cipher.getInstance("RSA");
 		cipher.init(Cipher.ENCRYPT_MODE, this.clientPubKey);
 		
