@@ -78,8 +78,8 @@ public class BlackboardAESSecuredService extends Thread implements Runnable {
 		this.outO.flush();
 		
 		System.out.println("\n"+"------- BLACKBOARD -------");
+		cipher.init(Cipher.DECRYPT_MODE, idaes.getAES());
 		while(!msg.equals(" ")) { //TODO add cryptotime
-			cipher.init(Cipher.DECRYPT_MODE, idaes.getAES());
 			this.in = new ObjectInputStream(this.clientSocket.getInputStream());
 			SealedObject ClientMsg = (SealedObject) in.readObject();
 			msg = (String) ClientMsg.getObject(cipher);

@@ -18,6 +18,7 @@ import javax.crypto.SealedObject;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
+import dataBase.DbLink;
 import dataContainers.IDAES;
 
 public class KeychainAESSecuredService extends Thread implements Runnable {
@@ -28,6 +29,7 @@ public class KeychainAESSecuredService extends Thread implements Runnable {
 	private KeychainWebService keychain;
 	private ObjectInputStream in;
 	private ObjectOutputStream outO;
+	private DbLink dbLink;
 
 	public KeychainAESSecuredService(KeychainWebService keychain, Socket accept, SecretKey ASAESKey) {
 		this.clientSocket = accept;
@@ -80,22 +82,11 @@ public class KeychainAESSecuredService extends Thread implements Runnable {
 		outO.writeObject(encryptedMsg);
 		outO.flush();
 		
-		Class.forName("com.mysql.jdbc.Driver");
-		Connection con=null;
-		try {
-			String OS = System.getProperty("os.name").toLowerCase();
-			if(OS.contains("mac")) {
-				con = DriverManager.getConnection("jdbc:mysql://localhost:8889/keychainDB","root", "root");
-			} else { //linux or windows
-			con = DriverManager.getConnection("jdbc:mysql://localhost/keychainDB","root", "");
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+		//dbLink = new DbLink();
 		
 		System.out.println("\n"+"------- KEYCHAIN -------");
+		cipher.init(Cipher.DECRYPT_MODE, idaes.getAES());
 		while(!msg.equals(" ")) { //TODO add cryptotime
-			cipher.init(Cipher.DECRYPT_MODE, idaes.getAES());
 			this.in = new ObjectInputStream(this.clientSocket.getInputStream());
 			SealedObject ClientMsg = (SealedObject) in.readObject();
 			msg = (String) ClientMsg.getObject(cipher);
