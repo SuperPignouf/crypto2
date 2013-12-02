@@ -22,8 +22,8 @@ import crypto.RsaKey;
  */
 public class KeychainWebService {
 	
-	private int ID = 2, userID = -1; // Personal ID and ID of the client mentioned by the AS when sending the C-WS.
-	private SecretKey ASKeychainAESKey; // The AS-Keychain AES session key.
+	private int ID = 2, userID = -1;
+	private SecretKey ASKeychainAESKey;
 	private ServerSocket myService;
 	private Socket clientSocket = null;
 	private Thread t;
@@ -32,10 +32,10 @@ public class KeychainWebService {
 
 	public KeychainWebService(RsaKey rsaKey, DbLink dblink) throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, IOException, ClassNotFoundException {
 		KeychainToAuthorisationServerUsingRSA TAS = new KeychainToAuthorisationServerUsingRSA(this, this.ID, rsaKey);
-		this.ASKeychainAESKey = TAS.getASKeychainAESKey(); // Get the AS-Keychain AES session key from the AS.
+		this.ASKeychainAESKey = TAS.getASKeychainAESKey();
 		this.dbLink=dblink;
 		initSocketConnection();
-		acceptConnections(); // On est pret a recevoir des requetes
+		acceptConnections();
 	}
 	
 	/**
@@ -64,10 +64,18 @@ public class KeychainWebService {
 		
 	}
 	
+	/**
+	 * Gets the user's ID.
+	 * @return the user's ID.
+	 */
 	public int getUserID() {
 		return this.userID;
 	}
 	
+	/**
+	 * Sets the user's ID.
+	 * @param userID - the user's ID.
+	 */
 	public void setUserID(int userID) {
 		this.userID = userID;
 	}
@@ -83,6 +91,10 @@ public class KeychainWebService {
 		}
 	}
 
+	/**
+	 * Sets the key AES which is used for the communication between this web service and the AS.
+	 * @param ASBlackboardAESKey - the key
+	 */
 	public void setASKeychainAES(SecretKey ASKeychainAESKey) {
 		this.ASKeychainAESKey = ASKeychainAESKey;
 	}

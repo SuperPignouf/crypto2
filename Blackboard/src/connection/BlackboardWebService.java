@@ -63,10 +63,18 @@ public class BlackboardWebService {
 		
 	}
 	
+	/**
+	 * Gets the user's ID.
+	 * @return the user's ID.
+	 */
 	public int getUserID() {
 		return this.userID;
 	}
 	
+	/**
+	 * Sets the user's ID.
+	 * @param userID - the user's ID.
+	 */
 	public void setUserID(int userID) {
 		this.userID = userID;
 	}
@@ -82,6 +90,10 @@ public class BlackboardWebService {
 		}
 	}
 
+	/**
+	 * Sets the key AES which is used for the communication between this web service and the AS.
+	 * @param ASBlackboardAESKey - the key
+	 */
 	public void setASBlackboardAES(SecretKey ASBlackboardAESKey) {
 		this.ASBlackboardAESKey = ASBlackboardAESKey;
 	}
