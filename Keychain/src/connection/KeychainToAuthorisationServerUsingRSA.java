@@ -57,6 +57,11 @@ public class KeychainToAuthorisationServerUsingRSA {
 		closeConnection();
 	}
 	
+	/**
+	 * Receives the certificate from the AS.
+	 * @throws IOException
+	 * @throws ClassNotFoundException
+	 */
 	private void receiveASCertificate() throws IOException, ClassNotFoundException {
 		ObjectInputStream in = new ObjectInputStream(this.toAS.getInputStream());
 		Certificate AScert = (Certificate)in.readObject();
@@ -64,6 +69,10 @@ public class KeychainToAuthorisationServerUsingRSA {
 		else System.out.println("ERREUR : Certificat de l'AS invalide");
 	}
 
+	/**
+	 * Initializes the socket (port 2442).
+	 * @throws IOException
+	 */
 	private void initConnection() throws IOException{
 		toAS = new Socket("localhost", 2442);
 	}

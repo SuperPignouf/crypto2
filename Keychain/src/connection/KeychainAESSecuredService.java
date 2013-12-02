@@ -110,6 +110,16 @@ public class KeychainAESSecuredService extends Thread implements Runnable {
 		System.out.println("KEYCHAIN : received cryptoperiod of that key : " + (Integer) encryptedCryptoperiod.getObject(cipher) + "sec");
 	}
 
+	/**
+	 * Identifies the client.
+	 * @throws IOException
+	 * @throws ClassNotFoundException
+	 * @throws IllegalBlockSizeException
+	 * @throws BadPaddingException
+	 * @throws InvalidKeyException
+	 * @throws NoSuchAlgorithmException
+	 * @throws NoSuchPaddingException
+	 */
 	private void identifyClient() throws IOException, ClassNotFoundException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException {
 		this.clientID = (Integer) this.in.readObject();
 		System.out.println("KEYCHAIN : received client ID : " + this.clientID);
